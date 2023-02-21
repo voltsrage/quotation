@@ -1,0 +1,50 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<br>
+<div class="row">
+    <div class="card card-body">
+        <h5>Quotations</h5>
+    </div>
+    <div class="card card-body">
+        <div class="d-flex bd-highlight mb-3">
+            <div class="me-auto p-2 bd-highlight">
+            </div>
+            <div class="p-2 bd-highlight">
+                <a type="button" href="{% url 'quotation:create' %}" class="btn btn-success">Create</a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Species</th>
+                        <th>Processing Method</th>
+                        <th>Harvesting Method</th>
+                        <th>Freezing Method</th>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                        <th>Rec'd Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for obj in obj_list %}
+                    <tr>
+                        <td>{{ obj.specie }}</td>
+                        <td>{{ obj.processing_method }}</td>
+                        <td>{{ obj.harvesting_method }}</td>
+                        <td>{{ obj.freezing_method }}</td>
+                        <td>{{ obj.origin }}</td>
+                        <td>{{ obj.destination }}</td>
+                        <td>{{ obj.recieved_date }}</td>
+                        <td>
+                            <a href="{{ obj.get_edit_url }}" class='btn btn-sm btn-primary'>Edit</a>
+                            <button class='btn btn-sm btn-danger'>Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

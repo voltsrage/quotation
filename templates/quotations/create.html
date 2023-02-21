@@ -1,0 +1,39 @@
+{% extends "base.html" %} {% load static %} {% load crispy_forms_tags %} {% block content %}
+<br>
+<div class="row">
+    <div class="card card-body">
+        <h5>Create Quotations</h5>
+    </div>
+    <div class="card card-body">
+        {% include "quotations/partials/forms.html" %}
+        <br>
+        <hr>
+        <div class="card card-body">
+            <h5>Size Prices</h5>
+        </div>
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Quotation</th>
+                    <th>Size</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sizeprice in obj.get_sizeprize_children %} {% include "quotations/partials/sizeprice-inline.html" with object=sizeprice %} {% endfor %}
+            </tbody>
+        </table>
+        {% for message in messages %} {% if message.tags == 'success'%}
+
+
+        <div class='alert alert-success alert-dismissable fade show' role='al
+				'>
+            {{message}}
+            <a href="{% url 'quotation:list'%}" type='button' class='btn btn-close' data-bs-dimiss='ale
+						' aria-label='Close'></a>
+        </div>
+        {%endif%} {% endfor %}
+    </div>
+</div>
+{% endblock %}

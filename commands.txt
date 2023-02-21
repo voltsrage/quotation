@@ -1,0 +1,87 @@
+# Launch virtual environment
+
+python3.10 -m venv .venv
+
+# Activate virtual environment
+
+./.venv/Scripts/Activate.ps1
+
+# Start a django project (in the same directory)
+
+django-admin startproject <project-name> .
+
+# To run the project
+
+python3 manage.py runserver 0.0.0.0:8000
+
+# To create a new application
+
+python3 manage.py startapp <application-name> or  docker-compose run --rm app python3 manage.py startapp <application-name>
+
+docker-compose run --rm app python3 manage.py startapp product
+
+# To add models to database
+
+python manage.py makemigrations or docker-compose run --rm app python manage.py makemigrations
+
+python manage.py migrate or docker-compose run --rm app python manage.py migrate
+
+# To create a requirements.txt by code
+
+pip freeze > requirements.txt
+
+# To run requirements.txt
+
+ pip install -r requirements.txt
+
+ #Docker commands
+
+ docker build -t django-ecommerce .
+docker run -p 8001:8000 python-django
+
+
+docker-compose build
+docker-compose run --rm app
+
+#To create project
+docker-compose run --rm app django-admin startproject <project-name> .
+
+docker-compose run --rm app django-admin startproject drfecommerce .
+
+docker-compose run --rm app django-admin startproject core .
+
+#To run project
+docker-compose up
+
+#To go into the docker container
+docker exec -it <container-name> /bin/bash
+
+# To run app in docker compose
+docker-compose run --rm app python3 manage.py runserver
+
+# To get a new secret key
+
+python manage.py shell or
+docker-compose run --rm app python manage.py shell
+
+then
+from django.core.management.utils import get_random_secret_key
+
+print(get_random_secret_key())
+
+# To create superuser
+
+docker-compose run --rm app python manage.py createsuperuser
+
+# To create drf-spectacular schema
+
+docker-compose run --rm app python manage.py spectacular --file schema.yml
+
+# To check test code coverage, install coverage==6.5.0 and pytest-cov==4.0.0, then run
+
+coverage run -m pytest
+
+coverage html
+
+# run pytest
+ docker-compose run --rm app pytest

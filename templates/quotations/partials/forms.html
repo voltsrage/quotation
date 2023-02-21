@@ -1,0 +1,72 @@
+{% load crispy_forms_tags %}
+
+<form action="." method='POST' style='width: 95%;' hx-post='.' hx-swap='outerHTML' novalidate>
+    {%csrf_token%}
+    <fieldset>
+        <legend>Date</legend>
+        {{form.recieved_date| as_crispy_field }}
+    </fieldset>
+    <hr>
+    <fieldset>
+        <legend>Product Information</legend>
+        <div class="row">
+            <div class=" col-6">
+                {{form.specie | as_crispy_field}}
+            </div>
+            <div class=" col-6">
+                {{form.origin | as_crispy_field}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-6">
+                {{form.processing_method | as_crispy_field}}
+            </div>
+            <div class="col-lg-4  col-6">
+                {{form.harvesting_method | as_crispy_field}}
+            </div>
+            <div class="col-lg-4 col-6">
+                {{form.freezing_method | as_crispy_field}}
+            </div>
+            {{form.product_image | as_crispy_field}}
+            <div class="row">
+                <div class=" col-6">
+                    {{form.catch_type | as_crispy_field}}
+                </div>
+                <div class=" col-6">
+                    {{form.packing | as_crispy_field}}
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <hr>
+    <fieldset>
+        <legend>Quotation Information</legend>
+        <div class="row">
+            <div class="col-lg-4 col-6">
+                {{form.container_quantity | as_crispy_field}}
+            </div>
+            <div class="col-lg-4  col-6">
+                {{form.incoterm | as_crispy_field}}
+            </div>
+            <div class="col-lg-4 col-6">
+                {{form.tax | as_crispy_field}}
+            </div>
+            <div class="row">
+                <div class=" col-6">
+                    {{form.shipped_from | as_crispy_field}}
+                </div>
+                <div class=" col-6">
+                    {{form.destination | as_crispy_field}}
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Notes</legend>
+        {{form.note| as_crispy_field }}
+    </fieldset>
+
+    <br>
+    <!-- {{form.as_p}} -->
+    <button type='submit' class='btn btn-outline-success'>Create Quotation</button>
+</form>
