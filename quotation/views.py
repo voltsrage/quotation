@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse,Http404
+from django.urls import reverse
 from django.forms.models import modelformset_factory
 from .models import Quotation,SizePrice
 from .forms import QuotationForm,SizePriceForm
@@ -21,11 +22,24 @@ def createQuotation(request):
 	return render(request,'quotations/create.html',context)
 
 def detailQuotation(request, id=None):
+	#hx_url = reverse("quotation:hx-detail", kwargs={"id":id})
 	obj = get_object_or_404(Quotation, id=id)
 	context = {
 		"obj" :obj
 	}
 	return render(request,'quotations/details.html',context)
+
+def detailQuotation_hx(request, id=None):
+	try:
+		obj = get_object_or_404(Quotation, id=id)
+	except:
+		obj = None
+	if obj is None:
+		return HttpResponse("Not Found.")
+	context = {
+		"obj" :obj
+	}
+	return render(request,'quotations/partials/details.html',context)
 
 
 def updateQuotation(request, id=None):
