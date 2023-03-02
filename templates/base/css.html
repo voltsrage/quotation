@@ -3,6 +3,22 @@
 <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/dashboard/">
 <link href="{% static 'dashboard/assets/dist/css/bootstrap.min.css' %}" rel="stylesheet">
 <style>
+    .htmx-indicator {
+        display: none;
+    }
+    
+    .htmx-inverted-indicator {
+        display: inline;
+    }
+    
+    .htmx-request .htmx-indicator {
+        display: inline;
+    }
+    
+    .htmx-request .htmx-inverted-indicator {
+        display: none;
+    }
+    
     .bd-placeholder-img {
         font-size: 1.125rem;
         text-anchor: middle;
@@ -52,6 +68,33 @@
         text-align: center;
         white-space: nowrap;
         -webkit-overflow-scrolling: touch;
+    }
+    
+    DIV.table {
+        display: table;
+        background-color: initial;
+    }
+    
+    div.thead {
+        display: table-header-group;
+        background-color: #04AA6D;
+        color: white;
+        font-size: 1rem;
+    }
+    
+    FORM.tr,
+    DIV.tr {
+        display: table-row;
+    }
+    
+    FORM.tr:nth-child(even),
+    DIV.tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    
+    SPAN.td {
+        display: table-cell;
+        border-bottom: 1px solid #ddd;
     }
 </style>
 <!-- Custom styles for this template -->

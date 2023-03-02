@@ -1,0 +1,19 @@
+{% load crispy_forms_tags %}
+
+
+<form action="." method='POST' style='width: 95%;' hx-post='{% if url %} {{url}} {% else %} . {% endif %}' hx-swap='outerHTML' novalidate>
+    {% csrf_token %} {{form.as_p}}
+    <!-- <div class="table">
+            <input type="hidden" name='quotation' value='{{form.quotation}}'>
+            <div class="tr">
+                <span class="td">{{form.size | as_crispy_field }}</span>
+                <span class="td">{{form.price | as_crispy_field }}</span>
+                <span class="td">{{form.price_unit | as_crispy_field }}</span>
+                <span class="td">{{form.currency | as_crispy_field }}</span>
+            </div>
+        </div> -->
+    <br>
+    <div class="htmx-indicator">Loading...</div>
+
+    <button type='submit' class='btn btn-outline-success htmx-inverted-indicator'>Save</button>
+</form>

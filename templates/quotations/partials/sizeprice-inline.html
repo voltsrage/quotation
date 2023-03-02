@@ -1,9 +1,10 @@
-<tr>
-    <td> {{object.quotation}}</td>
-    <td>{{object.size}} </td>
-    <td>{{object.price}}</td>
-    <td>
-        <a href="{{ obj.get_edit_url }}" class='btn btn-sm btn-primary'>Edit</a>
-        <button class='btn btn-sm btn-danger'>Delete</button>
-    </td>
-</tr>
+<div class="tr" id='sizeprice-{{object.id}}'>
+    <span class="td">{{object.quotation}}</span>
+    <span class="td">{{object.size}}</span>
+    <span class="td">{{object.price}}</span>
+    <span class="td">
+    <button type='button' hx-trigger='click' hx-get='{{ object.get_hx_edit_url }}' class='btn btn-sm btn-primary mb-2 mt-1' style='background-color: #0d6efd;' hx-target='#sizeprice-{{object.id}}'>Edit</button> |
+    <button class='btn btn-sm btn-danger mb-2 mt-1' style='background-color: #dc3545;'>Delete</button>
+	</span>
+
+</div>

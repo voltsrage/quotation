@@ -272,6 +272,9 @@ class Quotation(models.Model):
 	def get_absolute_url(self):
 		return reverse('quotation:detail', kwargs={'id':self.id})
 
+	def get_hx_url(self):
+		return reverse('quotation:hx-detail', kwargs={'id':self.id})
+
 	def get_edit_url(self):
 		return reverse('quotation:edit', kwargs={'id':self.id})
 
@@ -296,5 +299,13 @@ class SizePrice(models.Model):
 		)
 	create_at = models.DateTimeField(auto_now_add=True)
 
+	def get_hx_edit_url(self):
+		kwargs = {
+			"parent_id": self.quotation.id,
+			"id":self.id
+		}
+		print(kwargs)
+		return reverse('quotation:hx-sizeprice-detail', kwargs=kwargs)
+
 	def __str__(self):
-			 return f'{self.quotation}: {self.size} for {self.price}'
+		return f'{self.quotation}: {self.size} for {self.price}'

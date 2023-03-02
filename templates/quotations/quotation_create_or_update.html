@@ -1,0 +1,183 @@
+{% extends "base.html" %} {% load static %} {% load crispy_forms_tags %} {% block content %}
+
+<form enctype="multipart/form-data" class="container" method="post" id="quotation_form">
+    {% csrf_token %}
+
+    <div class="card">
+        <div class="card-header card-header-secondary">
+            <h4 class="card-title">Add quotation</h4>
+        </div>
+
+        <div class=" card-body">
+            <fieldset>
+                <legend>Date</legend>
+                {{form.recieved_date| as_crispy_field }}
+            </fieldset>
+            <hr>
+            <fieldset>
+                <legend>Product Information</legend>
+                <div class="row">
+                    <div class=" col-6">
+                        {{form.specie | as_crispy_field}}
+                    </div>
+                    <div class=" col-6">
+                        {{form.origin | as_crispy_field}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-6">
+                        {{form.processing_method | as_crispy_field}}
+                    </div>
+                    <div class="col-lg-4  col-6">
+                        {{form.harvesting_method | as_crispy_field}}
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        {{form.freezing_method | as_crispy_field}}
+                    </div>
+                    {{form.product_image | as_crispy_field}}
+                    <div class="row">
+                        <div class=" col-6">
+                            {{form.catch_type | as_crispy_field}}
+                        </div>
+                        <div class=" col-6">
+                            {{form.packing | as_crispy_field}}
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <hr>
+            <fieldset>
+                <legend>Quotation Information</legend>
+                <div class="row">
+                    <div class="col-lg-4 col-6">
+                        {{form.container_quantity | as_crispy_field}}
+                    </div>
+                    <div class="col-lg-4  col-6">
+                        {{form.incoterm | as_crispy_field}}
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        {{form.tax | as_crispy_field}}
+                    </div>
+                    <div class="row">
+                        <div class=" col-6">
+                            {{form.shipped_from | as_crispy_field}}
+                        </div>
+                        <div class=" col-6">
+                            {{form.destination | as_crispy_field}}
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Notes</legend>
+                {{form.note| as_crispy_field }}
+            </fieldset>
+        </div>
+
+    </div>
+
+    <!-- inline form for sizeprice start -->
+
+    <!-- EXPLAINING with named_formsets.sizeprices as formset -->
+    <!-- Note: named_formsets is used in get_context_data function in views.py -->
+    <!-- Note: here sizeprices is our SizePriceFormSet name, used in get_named_formsets function in views.py -->
+    {% with named_formsets.sizeprices as formset %} {{ formset.management_form }}
+    <script type="text/html" id="sizeprices-template"> // id="inlineformsetname-template" // id='inlineformsetname-__prefix__'
+        <tr id="sizeprices-__prefix__" class=h ide_all>
+            {% for fields in formset.empty_form.hidden_fields %} {{ fields }} {% endfor %} {% for fields in formset.empty_form.visible_fields %}
+            <td>{{fields}}</td>
+            {% endfor %}
+        </tr>
+    </script>
+    <div class="table-responsive card mt-4">
+        <div class="card-header card-header-secondary">
+            <h4 class="card-title">Add Size Prices</h4>
+        </div>
+        <table class="table card-header">
+            <thead class="text-secondary">
+                <th>Size <span style="color: red;" class="required">*</span></th>
+                <th>Price <span style="color: red;" class="required">*</span></th>
+                <th>Price Unit <span style="color: red;" class="required">*</span></th>
+                <th>Currency <span style="color: red;" class="required">*</span></th>
+                <th>Delete?</th>
+                <th>Custom Delete btn</th>
+            </thead>
+            <tbody id="item-sizeprices">
+                {% for error in formset.non_form_errors %}
+                <span style="color: red">{{ error }}</span> {% endfor %} {% for formss in formset %} {{ formss.management_form }}
+
+                <tr id="sizeprices-{{ forloop.counter0 }}" class=hide_all>
+                    {{ formss.id }} {% for field in formss.visible_fields %}
+                    <td>
+                        {{field }} {% for error in field.errors %}
+                        <span style="color: red">{{ error }}</span> {% endfor %}{% comment %} for delete {% endcomment %} {% if formss.instance.pk %}
+                        <td>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal{{formss.instance.pk}}">
+																								Delete
+																						</button>
+                            <!-- Modal -->
+                            <div class="modal fade" id="exampleModal{{formss.instance.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{formss.instance.pk}}" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel{{formss.instance.pk}}">Are Your Sure You Want To Delete This?</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																												<span aria-hidden="true">&times;</span>
+																										</button>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="{% url 'products:delete_sizeprice' formss.instance.pk %}" type="button" class="btn btn-primary">Yes, Delete</a>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        {% endif %}
+                    </td>
+
+                    {% endfor %}
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+        </table>
+        <a href="#" id="add-sizeprice-button" class="btn btn-secondary add-sizeprices">Add More</a>
+    </div>
+
+    {% endwith %}
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-success btn-block" style='width: 100%;'>Submit</button>
+    </div>
+</form>
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
+
+<script>
+    $(document).ready(function() {
+        // when user clicks add more btn of sizeprices
+        $('.add-sizeprices').click(function(ev) {
+            ev.preventDefault();
+            var count = $('#item-sizeprices').children().length;
+            var tmplMarkup = $('#sizeprices-template').html();
+            var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+            $('#item-sizeprices').append(compiledTmpl);
+
+            // update form count
+            $('#id_sizeprices-TOTAL_FORMS').attr('value', count + 1);
+        });
+
+        $('body').on('change', '.priceunit', function() {
+            if ($(this).val() == 3) {
+                console.log('box')
+            }
+
+        })
+    });
+</script>
+
+{% endblock %}

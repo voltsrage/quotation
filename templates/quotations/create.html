@@ -11,7 +11,7 @@
         <div class="card card-body">
             <h5>Size Prices</h5>
         </div>
-        <table class="table table-striped">
+        <!-- <table class="table table-striped">
             <thead class="thead-dark">
                 <tr>
                     <th>Quotation</th>
@@ -23,17 +23,37 @@
             <tbody>
                 {% for sizeprice in obj.get_sizeprize_children %} {% include "quotations/partials/sizeprice-inline.html" with object=sizeprice %} {% endfor %}
             </tbody>
-        </table>
-        {% for message in messages %} {% if message.tags == 'success'%}
+        </table> -->
+        <div class="table">
+            <div class="thead">
+                <div class="tr">
+                    <span class="td">Quotation</span>
+                    <span class="td">Size</span>
+                    <span class="td">Price</span>
+                    <span class="td">Actions</span>
+                </div>
+            </div>
 
-
-        <div class='alert alert-success alert-dismissable fade show' role='al
-				'>
-            {{message}}
-            <a href="{% url 'quotation:list'%}" type='button' class='btn btn-close' data-bs-dimiss='ale
-						' aria-label='Close'></a>
+            {% for sizeprice in obj.get_sizeprize_children %} {% include "quotations/partials/sizeprice-inline.html" with object=sizeprice %} {% endfor %}
         </div>
-        {%endif%} {% endfor %}
+
+        {% if new_sizeprice_url %}
+        <div id='ingredient-create'>
+
+        </div>
+
+        <button hx-get='{{ new_sizeprice_url}}' hx-trigger='click' hx-target='#ingredient-create' class='btn btn-sm btn-secondary' hx-swap='beforeend'>Add Size Price</button> {% endif %}
+
+    </div>{% for message in messages %} {% if message.tags == 'success'%}
+
+
+    <div class='alert alert-success alert-dismissable fade show' role='al
+				'>
+        {{message}}
+        <a href="{% url 'quotation:list'%}" type='button' class='btn btn-close' data-bs-dimiss='ale
+						' aria-label='Close'></a>
     </div>
+    {%endif%} {% endfor %}
+</div>
 </div>
 {% endblock %}

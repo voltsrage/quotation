@@ -1,0 +1,103 @@
+<form action=".">
+
+    <fieldset>
+        <legend>Date</legend>
+        {{obj.recieved_date }}
+    </fieldset>
+    <hr>
+    <fieldset>
+        <legend>Product Information</legend>
+        <div class="row">
+            <div class=" col-6">
+                <label for="">Species</label>
+                <input class='form-control' type="text" name="" id="" value='{{obj.specie }}' readonly>
+
+            </div>
+            <div class=" col-6">
+                <label for="">Origin</label>
+                <input class='form-control' type="text" name="" id="" value='{{obj.origin }}' readonly>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-6">
+                <label for="">Processing Method</label>
+                <input class='form-control' type="text" name="" id="" value='{{obj.processing_method }}' readonly>
+            </div>
+            <div class="col-lg-4  col-6">
+                <label for="">Harvesting Method</label>
+                <input class='form-control' type="text" name="" id="" value='{{obj.harvesting_method }}' readonly>
+            </div>
+            <div class="col-lg-4 col-6">
+                <label for="">Freezing Method</label>
+                <input class='form-control' type="text" name="" id="" value='{{obj.freezing_method }}' readonly>
+            </div>
+            {{obj.product_image }}
+            <div class="row">
+                <div class=" col-6">
+                    <label for="">Catch Type</label>
+                    <input class='form-control' type="text" name="" id="" value='{{obj.catch_type }}' readonly>
+                </div>
+                <div class=" col-6">
+                    <label for="">Packing</label>
+                    <input class='form-control' type="text" name="" id="" value='{{obj.packing }}' readonly>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <hr>
+    <fieldset>
+        <legend>Quotation Information</legend>
+        <div class="row">
+            <div class="col-lg-4 col-6">
+                <label for="">Container Quantity</label>
+                <input class='form-control' type="text" name="" id="" value='{{obj.container_quantity }}' readonly>
+            </div>
+            <div class="col-lg-4  col-6">
+                <label for="">Incoterm</label>
+                <input class='form-control' type="text" name="" id="" value='{{obj.incoterm }}' readonly>
+            </div>
+            <div class="col-lg-4 col-6">
+                <label for="">Tax</label>
+                <input class='form-control' type="text" name="" id="" value='{{obj.tax }}' readonly>
+            </div>
+            <div class="row">
+                <div class=" col-6">
+                    <label for="">Shipped From</label>
+                    <input class='form-control' type="text" name="" id="" value='{{obj.shipped_from }}' readonly>
+                </div>
+                <div class=" col-6">
+                    <label for="">Destination</label>
+                    <input class='form-control' type="text" name="" id="" value='{{obj.destination }}' readonly>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Notes</legend>
+        {{obj.note }}
+    </fieldset>
+
+    <br>
+</form>
+
+<div class="card card-body">
+    <h5>Size Prices</h5>
+</div>
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>Quotation</th>
+            <th>Size</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sizeprice in obj.get_sizeprize_children %}
+        <tr>
+            <td> {{sizeprice.quotation}}</td>
+            <td>{{sizeprice.size}} </td>
+            <td>{{sizeprice.price}}</td>
+        </tr> {% endfor %}
+    </tbody>
+</table>
