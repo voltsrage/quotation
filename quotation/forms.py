@@ -1,5 +1,5 @@
 from django import forms
-from .models import Quotation, SizePrice
+from .models import Quotation, SizePrice,Supplier
 from django.forms import inlineformset_factory
 
 class QuotationForm(forms.ModelForm):
@@ -13,6 +13,27 @@ class QuotationForm(forms.ModelForm):
 		model = Quotation
 		exclude = ('create_by',)
 
+
+class SupplierForm(forms.ModelForm):
+	class Meta:
+		model = Supplier
+		exclude = ('create_by',)
+		widgets = {
+            'name': forms.TextInput(
+                attrs={
+                    'class': 'form-control'
+                    }
+                ),
+        }
+
+	def clean_name(self):
+		name = self.cleaned_data['name']
+		if Supplier.objects.filter(name=name):
+			raise forms.ValidationError(
+				'Supplier with this name already exists'
+			)
+		else:
+			return name
 
 class SizePriceForm(forms.ModelForm):
 	class Meta:

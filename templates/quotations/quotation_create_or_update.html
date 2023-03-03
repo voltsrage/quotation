@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% load static %} {% load crispy_forms_tags %} {% block content %}
 
-<form enctype="multipart/form-data" class="container" method="post" id="quotation_form">
+<form enctype="multipart/form-data" class="container-fluid my-4" method="post" id="quotation_form">
     {% csrf_token %}
 
     <div class="card">
@@ -55,18 +55,30 @@
                     <div class="col-lg-4  col-6">
                         {{form.incoterm | as_crispy_field}}
                     </div>
+
+                    <div class="col-lg-4 col-6 row">
+                        <div class='col-10'>
+                            {{form.supplier | as_crispy_field}}
+                        </div>
+                        <div class=' col-2 text=center'>
+                            <br><br>
+                            <a type="button" style='color: blue;' data-bs-toggle="modal" data-bs-target="#newsupplier"><i class='fa fa-plus'></i></a>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4 col-6">
                         {{form.tax | as_crispy_field}}
                     </div>
-                    <div class="row">
-                        <div class=" col-6">
-                            {{form.shipped_from | as_crispy_field}}
-                        </div>
-                        <div class=" col-6">
-                            {{form.destination | as_crispy_field}}
-                        </div>
+                    <div class=" col-lg-4 col-6">
+                        {{form.shipped_from | as_crispy_field}}
+                    </div>
+                    <div class=" col-lg-4 col-6">
+                        {{form.destination | as_crispy_field}}
                     </div>
                 </div>
+
             </fieldset>
             <fieldset>
                 <legend>Notes</legend>
@@ -110,40 +122,47 @@
                     {{ formss.id }} {% for field in formss.visible_fields %}
                     <td>
                         {{field }} {% for error in field.errors %}
-                        <span style="color: red">{{ error }}</span> {% endfor %}{% comment %} for delete {% endcomment %} {% if formss.instance.pk %}
-                        <td>
-                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal{{formss.instance.pk}}">
+                        <span style="color: red">{{ error }}</span> {% endfor %}{% comment %} for delete {% endcomment %}
+
+                    </td>
+                    {% endfor %} {% if formss.instance.pk %}
+                    <td>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal{{formss.instance.pk}}">
 																								Delete
 																						</button>
-                            <!-- Modal -->
-                            <div class="modal fade" id="exampleModal{{formss.instance.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{formss.instance.pk}}" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel{{formss.instance.pk}}">Are Your Sure You Want To Delete This?</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModal{{formss.instance.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{formss.instance.pk}}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel{{formss.instance.pk}}">Are Your Sure You Want To Delete This?</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 																												<span aria-hidden="true">&times;</span>
 																										</button>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <a href="{% url 'products:delete_sizeprice' formss.instance.pk %}" type="button" class="btn btn-primary">Yes, Delete</a>
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a href="{% url 'quotation:delete_sizeprice' formss.instance.pk %}" type="button" class="btn btn-primary">Yes, Delete</a>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                     </div>
                                 </div>
                             </div>
-                        </td>
-                        {% endif %}
-                    </td>
+                        </div>
 
-                    {% endfor %}
-                </tr>
 
-                {% endfor %}
 
-            </tbody>
-        </table>
-        <a href="#" id="add-sizeprice-button" class="btn btn-secondary add-sizeprices">Add More</a>
+    </div>
+    </td>
+
+    </td>
+    {% endif %}
+
+    </tr>
+
+    {% endfor %}
+
+    </tbody>
+    </table>
+    <a href="#" id="add-sizeprice-button" class="btn btn-secondary add-sizeprices">Add More</a>
     </div>
 
     {% endwith %}
@@ -153,31 +172,59 @@
     </div>
 </form>
 
+<!-- Modal Neww Supplier -->
+<div class="modal fade" id="newsupplier" tabindex="-1" role="dialog" aria-labelledby="newsupplier" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Supplier</h5>
 
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+            </div>
+            <form action='' class="container-fluid my-4" method="post" id="quotation_form">
+                <div class='modal-body'>
+
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="">{{supplierform.name.label_tag}}</label> {{supplierform.name}}
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
 
-<script>
-    $(document).ready(function() {
-        // when user clicks add more btn of sizeprices
-        $('.add-sizeprices').click(function(ev) {
-            ev.preventDefault();
-            var count = $('#item-sizeprices').children().length;
-            var tmplMarkup = $('#sizeprices-template').html();
-            var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
-            $('#item-sizeprices').append(compiledTmpl);
+    <script>
+        $(document).ready(function() {
+            // when user clicks add more btn of sizeprices
+            $('.add-sizeprices').click(function(ev) {
+                ev.preventDefault();
+                var count = $('#item-sizeprices').children().length;
+                var tmplMarkup = $('#sizeprices-template').html();
+                var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+                $('#item-sizeprices').append(compiledTmpl);
 
-            // update form count
-            $('#id_sizeprices-TOTAL_FORMS').attr('value', count + 1);
+                // update form count
+                $('#id_sizeprices-TOTAL_FORMS').attr('value', count + 1);
+            });
+
+            $('body').on('change', '.priceunit', function() {
+                var idNum = $(this)[0].id[$(this)[0].id.indexOf('-') + 1]
+
+                var input = jQuery('<input id="net_weight' + idNum.toString() + '" class="form-control mt-2" name="net_weight' + idNum.toString() + '" placeholder="Net Weight/Box (kg)"/>')
+
+                if ($(this).val() == 3) {
+                    var curTd = $(this).parent()
+                    curTd.append(input)
+                } else {
+                    jQuery('#net_weight' + idNum.toString()).remove()
+                }
+            })
         });
+    </script>
 
-        $('body').on('change', '.priceunit', function() {
-            if ($(this).val() == 3) {
-                console.log('box')
-            }
-
-        })
-    });
-</script>
-
-{% endblock %}
+    {% endblock %}

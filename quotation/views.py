@@ -3,7 +3,7 @@ from django.http import HttpResponse,Http404
 from django.urls import reverse
 from django.forms.models import modelformset_factory
 from .models import Quotation,SizePrice
-from .forms import QuotationForm,SizePriceForm,SizeFormSet
+from .forms import QuotationForm,SizePriceForm,SizeFormSet,SupplierForm
 from django.contrib import messages
 from django.views.generic import ListView
 from django.views.generic.edit import (
@@ -14,7 +14,6 @@ def createQuotation(request):
 	form = QuotationForm(request.POST or None)
 	context = {
 		"form" :form,
-		"new_sizeprice_url":new_sizeprice_url
 	}
 	if form.is_valid():
 		obj = form.save(commit=False)
@@ -149,6 +148,7 @@ class QuotationCreate(QuotationInline, CreateView):
 
 	def get_context_data(self, **kwargs):
 		ctx = super(QuotationCreate, self).get_context_data(**kwargs)
+		ctx['supplierform'] = SupplierForm(self.request.POST or None)
 		ctx['named_formsets'] = self.get_named_formsets()
 		print(ctx)
 		return ctx
@@ -183,10 +183,21 @@ def delete_sizeprice(request, pk):
         messages.success(
             request, 'Object Does not exit'
             )
-        return redirect('quotations:update_quotation', pk=sizeprice.quotation.id)
+        return redirect('quotation:update_quotation', pk=sizeprice.quotation.id)
 
     sizeprice.delete()
     messages.success(
             request, 'sizeprice deleted successfully'
             )
-    return redirect('quotations:update_quotation', pk=sizeprice.quotation.id)
+    return redirect('quotation:update_quotation', pk=sizeprice.quotation.id)
+
+def add_supplier(request):
+	if request.method == 'POST':
+		form = SupplierForm(request.POST or None)
+		if form.is_valid():
+			obj = form.save(commit=False)
+			obj.create_by = request.user
+			obj.save()
+			return HttpResponse("Supplier saved successfully")
+		else:
+			return HttpResponse("Form is not valid")
