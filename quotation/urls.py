@@ -10,13 +10,16 @@ from .views import (
 	detailQuotation,
   QuotationCreate,
 	delete_sizeprice,
-  QuotationUpdate
+  QuotationUpdate,
+  add_supplier,
+  add_supplier_reload_supplier_dropdown
 )
 
 app_name = 'quotation'
 urlpatterns = [
 	path('', listQuotation, name='list'),
 	path('create/', createQuotation, name='create'),
+  path('create-supplier/', add_supplier, name='create_supplier'),
   path('create-new/', QuotationCreate.as_view(), name='create_new'),
   path('update/<int:pk>/', QuotationUpdate.as_view(), name='update_quotation'),
   path('delete-sizeprice/<int:pk>/', delete_sizeprice, name='delete_sizeprice'),
@@ -25,4 +28,5 @@ urlpatterns = [
 	path('hx/<int:id>/', detailQuotation_hx, name='hx-detail'),
 	path('<int:id>/edit', updateQuotation, name='edit'),
 	path('<int:id>/', detailQuotation, name='detail'),
+	path('add_supplier_reload', add_supplier_reload_supplier_dropdown, name='add_supplier_reload')
 ]

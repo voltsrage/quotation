@@ -4,7 +4,7 @@ from django.forms import inlineformset_factory
 
 class QuotationForm(forms.ModelForm):
 	recieved_date = forms.DateField(
-		widget=forms.DateTimeInput(attrs={'type':'date'})
+		widget=forms.DateInput(attrs={'type':'date'})
 		)
 	note = forms.CharField(
 		widget=forms.Textarea(attrs={'rows':5})
@@ -36,6 +36,8 @@ class SupplierForm(forms.ModelForm):
 			return name
 
 class SizePriceForm(forms.ModelForm):
+	net_weight_box = forms.DecimalField(max_digits=6,decimal_places=2,widget=forms.NumberInput(attrs={
+                    'class': 'form-control', 'step': 0.01, 'placeholder':'NetWeight/box (kg)' }),required=False)
 	class Meta:
 		model = SizePrice
 		exclude = ('create_by',)
@@ -65,5 +67,5 @@ class SizePriceForm(forms.ModelForm):
 
 SizeFormSet = inlineformset_factory(
 	Quotation, SizePrice, form=SizePriceForm,
-	extra=1, can_delete=True, can_delete_extra=True
+	extra=1, can_delete=True, can_delete_extra=True, can_order=True
 )

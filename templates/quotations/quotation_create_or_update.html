@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% load static %} {% load crispy_forms_tags %} {% block content %}
+{% extends "base.html" %} {% load static %} {% load crispy_forms_tags %} {% load widget_tweaks %} {% block content %}
 
 <form enctype="multipart/form-data" class="container-fluid my-4" method="post" id="quotation_form">
     {% csrf_token %}
@@ -96,9 +96,30 @@
     {% with named_formsets.sizeprices as formset %} {{ formset.management_form }}
     <script type="text/html" id="sizeprices-template"> // id="inlineformsetname-template" // id='inlineformsetname-__prefix__'
         <tr id="sizeprices-__prefix__" class=h ide_all>
-            {% for fields in formset.empty_form.hidden_fields %} {{ fields }} {% endfor %} {% for fields in formset.empty_form.visible_fields %}
-            <td>{{fields}}</td>
-            {% endfor %}
+            {% for fields in formset.empty_form.hidden_fields %} {{ fields }} {% endfor %} {{ formss.id }}
+            <td>
+                {{formset.empty_form.size}} {% for error in formset.empty_form.size.errors %}
+                <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formset.empty_form.size.DELETE }} {% endcomment %}
+            </td>
+            <td>
+                {{formset.empty_form.price}} {% for error in formset.empty_form.price.errors %}
+                <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formset.empty_form.price.DELETE }} {% endcomment %}
+            </td>
+            <td>
+                {{formset.empty_form.price_unit}} {% for error in formset.empty_form.price_unit.errors %}
+                <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formset.empty_form.price_unit.DELETE }} {% endcomment %}
+                <div class='netweight net-weight-display' id='netweight-__prefix__'>{{formset.empty_form.net_weight_box}}</div>
+            </td>
+            <td>
+                {{formset.empty_form.currency}} {% for error in formset.empty_form.currency.errors %}
+                <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formset.empty_form.currency.DELETE }} {% endcomment %}
+            </td>
+            <td>
+                {{formset.empty_form.DELETE}}
+            </td>
+            <td>
+                <a href="#" id="clone-sizeprice-button-__prefix__" class="btn btn-secondary clone-sizeprices">Clone</a>
+            </td>
         </tr>
     </script>
     <div class="table-responsive card mt-4">
@@ -112,24 +133,48 @@
                 <th>Price Unit <span style="color: red;" class="required">*</span></th>
                 <th>Currency <span style="color: red;" class="required">*</span></th>
                 <th>Delete?</th>
+                <th>Clone</th>
                 <th>Custom Delete btn</th>
+
             </thead>
             <tbody id="item-sizeprices">
+                <!-- id="item-inlineformsetname" -->
+                <!-- formset non forms errors -->
                 {% for error in formset.non_form_errors %}
                 <span style="color: red">{{ error }}</span> {% endfor %} {% for formss in formset %} {{ formss.management_form }}
+                <tr id="sizeprices-{{ forloop.counter0 }}" class=h ide_all>
+                    <!-- id="inlineformsetname-counter" -->
 
-                <tr id="sizeprices-{{ forloop.counter0 }}" class=hide_all>
-                    {{ formss.id }} {% for field in formss.visible_fields %}
+                    {{ formss.id }}
                     <td>
-                        {{field }} {% for error in field.errors %}
-                        <span style="color: red">{{ error }}</span> {% endfor %}{% comment %} for delete {% endcomment %}
-
+                        {{formss.size}} {% for error in formss.size.errors %}
+                        <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formss.size.DELETE }} {% endcomment %}
                     </td>
-                    {% endfor %} {% if formss.instance.pk %}
+                    <td>
+                        {{formss.price}} {% for error in formss.price.errors %}
+                        <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formss.price.DELETE }} {% endcomment %}
+                    </td>
+                    <td>
+                        {{formss.price_unit}} {% for error in formss.price_unit.errors %}
+                        <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formss.price_unit.DELETE }} {% endcomment %}
+                        <div class='netweight net-weight-display' id='netweight-{{ forloop.counter0 }}'>{{formss.net_weight_box}}</div>
+                    </td>
+                    <td>
+                        {{formss.currency}} {% for error in formss.currency.errors %}
+                        <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formss.currency.DELETE }} {% endcomment %}
+                    </td>
+
+                    <td>
+                        {{formss.DELETE}}
+                    </td>
+                    <td>
+                        <a href="#" id="clone-sizeprice-button-{{ forloop.counter0 }}" class="btn btn-secondary clone-sizeprices">Clone</a>
+                    </td>
+                    {% comment %} for delete {% endcomment %} {% if formss.instance.pk %}
                     <td>
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal{{formss.instance.pk}}">
-																								Delete
-																						</button>
+																	Delete
+															</button>
                         <!-- Modal -->
                         <div class="modal fade" id="exampleModal{{formss.instance.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{formss.instance.pk}}" aria-hidden="true">
                             <div class="modal-dialog" role="document">
@@ -137,32 +182,23 @@
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="exampleModalLabel{{formss.instance.pk}}">Are Your Sure You Want To Delete This?</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-																												<span aria-hidden="true">&times;</span>
-																										</button>
+																					<span aria-hidden="true">&times;</span>
+																			</button>
                                     </div>
                                     <div class="modal-footer">
                                         <a href="{% url 'quotation:delete_sizeprice' formss.instance.pk %}" type="button" class="btn btn-primary">Yes, Delete</a>
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-
-
-    </div>
-    </td>
-
-    </td>
-    {% endif %}
-
-    </tr>
-
-    {% endfor %}
-
-    </tbody>
-    </table>
-    <a href="#" id="add-sizeprice-button" class="btn btn-secondary add-sizeprices">Add More</a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="#" id="add-sizeprice-button" class="btn btn-secondary add-sizeprices">Add More</a>
     </div>
 
     {% endwith %}
@@ -180,7 +216,7 @@
                 <h5 class="modal-title">Add Supplier</h5>
 
             </div>
-            <form action='' class="container-fluid my-4" method="post" id="quotation_form">
+            <form class="container-fluid my-4" method="post" id="supplier_form">
                 <div class='modal-body'>
 
                     {% csrf_token %}
@@ -190,17 +226,56 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" id='supplierAdditionId' class="btn btn-primary">Save</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
     </div>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <script>
         $(document).ready(function() {
             // when user clicks add more btn of sizeprices
+
+            $('.priceunit').each(function() {
+                var idNum = $(this)[0].id[$(this)[0].id.indexOf('-') + 1]
+                if ($(this).val() == 3) {
+                    $('#netweight-' + idNum.toString()).removeClass('net-weight-display')
+                }
+            })
+
+            $('#supplierAdditionId').on('click', function() {
+                name = $('#id_name').val()
+                console.log(name)
+                $.ajax({
+                    data: {
+                        name: name
+                    }, // get the form data
+                    url: "{% url 'quotation:add_supplier_reload' %}",
+                    // on success
+                    success: function(response) {
+                        console.log(response)
+                        var row = "";
+                        $('#id_supplier').empty()
+                        row += "<option selected >---------</option>";
+                        for (var i = 0; i < response.suppliers.length; i++) {
+                            row += "<option value=" + response.suppliers[i].pk + ">" + response.suppliers[i].fields.name + "</option>";
+                        }
+                        $('#id_supplier').html(row);
+                        $('#newsupplier').modal('hide');
+                    },
+                    // on error
+                    error: function(response) {
+                        // alert the error if any error occured
+                        console.log(response.responseJSON.errors)
+                    }
+                });
+
+                return false;
+            });
+
+
             $('.add-sizeprices').click(function(ev) {
                 ev.preventDefault();
                 var count = $('#item-sizeprices').children().length;
@@ -212,16 +287,63 @@
                 $('#id_sizeprices-TOTAL_FORMS').attr('value', count + 1);
             });
 
+            $('body').on('click', '.clone-sizeprices', function(ev) {
+                ev.preventDefault();
+                var idNum = $(this)[0].id[$(this)[0].id.length - 1]
+                console.log(idNum)
+                var count = $('#item-sizeprices').children().length;
+                var tmplMarkup = $(this).parent().parent();
+                var $clone = tmplMarkup.clone();
+
+                var priceUnitValue = tmplMarkup.find('#id_sizeprices-' + idNum.toString() + '-price_unit').val()
+                var currencyValue = tmplMarkup.find('#id_sizeprices-' + idNum.toString() + '-currency').val()
+                console.log("priceUnitValue", priceUnitValue)
+                console.log("currencyValue", currencyValue)
+
+
+                $clone.find('#id_sizeprices-' + idNum.toString() + '-quotation').attr("id", 'id_sizeprices-' + count.toString() + '-quotation')
+                $clone.find('#id_sizeprices-' + idNum.toString() + '-id').attr("id", 'id_sizeprices-' + count.toString() + '-id')
+                $clone.find('#id_sizeprices-' + idNum.toString() + '-size').attr("id", 'id_sizeprices-' + count.toString() + '-size')
+                $clone.find('#id_sizeprices-' + idNum.toString() + '-price').attr("id", 'id_sizeprices-' + count.toString() + '-price')
+                $clone.find('#id_sizeprices-' + idNum.toString() + '-price_unit').attr("id", 'id_sizeprices-' + count.toString() + '-price_unit')
+                $clone.find('#id_sizeprices-' + idNum.toString() + '-currency').attr("id", 'id_sizeprices-' + count.toString() + '-currency')
+                $clone.find('#id_sizeprices-' + idNum.toString() + '-net_weight_box').attr("id", 'id_sizeprices-' + count.toString() + '-net_weight_box')
+                $clone.find('#id_sizeprices-' + idNum.toString() + '-DELETE').attr("id", 'id_sizeprices-' + count.toString() + '-DELETE')
+                $clone.find('#netweight-' + idNum.toString()).attr("id", 'netweight-' + count.toString())
+
+                $clone.find('#id_sizeprices-' + count.toString() + '-quotation').attr("name", 'sizeprices-' + count.toString() + '-quotation')
+                $clone.find('#id_sizeprices-' + count.toString() + '-id').attr("name", 'sizeprices-' + count.toString() + '-id')
+                $clone.find('#id_sizeprices-' + count.toString() + '-size').attr("name", 'sizeprices-' + count.toString() + '-size')
+                $clone.find('#id_sizeprices-' + count.toString() + '-price').attr("name", 'sizeprices-' + count.toString() + '-price')
+                $clone.find('#id_sizeprices-' + count.toString() + '-price_unit').attr("name", 'sizeprices-' + count.toString() + '-price_unit')
+                $clone.find('#id_sizeprices-' + count.toString() + '-price_unit').find('option').removeAttr("selected");
+                $clone.find('#id_sizeprices-' + count.toString() + '-currency').attr("name", 'sizeprices-' + count.toString() + '-currency')
+                $clone.find('#id_sizeprices-' + count.toString() + '-currency').find('option').removeAttr("selected");
+                $clone.find('#id_sizeprices-' + count.toString() + '-net_weight_box').attr("name", 'sizeprices-' + count.toString() + '-net_weight_box')
+                $clone.find('#id_sizeprices-' + count.toString() + '-DELETE').attr("name", 'sizeprices-' + count.toString() + '-DELETE')
+
+                $clone.find('#clone-sizeprice-button-' + idNum.toString()).attr("id", 'clone-sizeprice-button-' + count.toString())
+                $clone.attr("id", 'sizeprices-' + count.toString());
+                // var compiledTmpl = tmplMarkup.replace("sizeprices", "sizepriceasasa");
+                // console.log(compiledTmpl)
+                //$('#item-sizeprices').append(compiledTmpl);
+                // update form count
+                $('#id_sizeprices-TOTAL_FORMS').attr('value', count + 1);
+                $clone.appendTo('#item-sizeprices')
+
+                $('#id_sizeprices-' + count.toString() + '-price_unit').find("option[value=" + priceUnitValue + "]").attr("selected", true);
+                $('#id_sizeprices-' + count.toString() + '-currency').find("option[value=" + currencyValue + "]").attr("selected", true);
+            })
+
+
             $('body').on('change', '.priceunit', function() {
                 var idNum = $(this)[0].id[$(this)[0].id.indexOf('-') + 1]
-
-                var input = jQuery('<input id="net_weight' + idNum.toString() + '" class="form-control mt-2" name="net_weight' + idNum.toString() + '" placeholder="Net Weight/Box (kg)"/>')
+                    // var input = jQuery('<input id="id_sizeprices-' + idNum.toString() + '-net_weight_box" class="form-control mt-2" name="sizeprices-' + idNum.toString() + '-net_weight_box" placeholder="Net Weight/Box (kg)"/>')
 
                 if ($(this).val() == 3) {
-                    var curTd = $(this).parent()
-                    curTd.append(input)
+                    $('#netweight-' + idNum.toString()).removeClass('net-weight-display')
                 } else {
-                    jQuery('#net_weight' + idNum.toString()).remove()
+                    $('#netweight-' + idNum.toString()).addClass('net-weight-display')
                 }
             })
         });

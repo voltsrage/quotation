@@ -282,7 +282,7 @@ class Quotation(models.Model):
 		return reverse('quotation:update_quotation', kwargs={'pk':self.id})
 
 	def get_sizeprize_children(self):
-		return self.sizeprice_set.all()
+		return self.sizeprices.all()
 
 	def __str__(self):
 			 return f'{self.specie}-{self.origin}-{self.destination}'
@@ -295,7 +295,7 @@ class SizePrice(models.Model):
 	price = models.DecimalField(decimal_places=2,max_digits=10)
 	price_unit = models.ForeignKey(PriceUnit, on_delete=models.SET_NULL, blank=True, null=True)
 	currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, blank=True, null=True)
-	quotation = models.ForeignKey(Quotation, on_delete=models.CASCADE)
+	quotation = models.ForeignKey(Quotation, on_delete=models.CASCADE,related_name='sizeprices')
 	create_by = models.ForeignKey(
 			settings.AUTH_USER_MODEL,
 			on_delete=models.DO_NOTHING,null=True, blank=True
@@ -312,3 +312,14 @@ class SizePrice(models.Model):
 
 	def __str__(self):
 		return f'{self.quotation}: {self.size} for {self.price}'
+
+class SizePriceBoxNetWeight(models.Model):
+	"""Create a model for storing net weights for quotations list box as price unit"""
+	sizeprice = models.ForeignKey(SizePrice, on_delete=models.CASCADE, related_name='netweight')
+	net_weight = models.DecimalField(max_digits=5, decimal_places=2)
+
+	def __str__(self):
+			return f'{self.net_weight}'
+
+	class Meta:
+		ordering = ["sizeprice"]

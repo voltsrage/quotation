@@ -2,10 +2,13 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse,Http404
 from django.urls import reverse
 from django.forms.models import modelformset_factory
-from .models import Quotation,SizePrice
+from .models import Quotation,SizePrice,SizePriceBoxNetWeight,Supplier
 from .forms import QuotationForm,SizePriceForm,SizeFormSet,SupplierForm
 from django.contrib import messages
 from django.views.generic import ListView
+from django.core.serializers import serialize
+import json
+from django.http import JsonResponse
 from django.views.generic.edit import (
     CreateView, UpdateView
 )
@@ -26,14 +29,12 @@ def createQuotation(request):
 
 def detailQuotation(request, id=None):
 	hx_url = reverse("quotation:hx-detail", kwargs={"id":id})
-	print(hx_url)
 	context = {
 		"hx_url" :hx_url
 	}
 	return render(request,'quotations/details.html',context)
 
 def detailQuotation_hx(request, id=None):
-	print(id)
 	if not request.htmx:
 		raise Http404
 	try:
@@ -67,8 +68,6 @@ def updateQuotation(request, id=None):
 
 def listQuotation(request):
 	obj_list = Quotation.objects.all()
-	for item in obj_list:
-		print(item.specie)
 	context = {
 		"obj_list":obj_list
 	}
@@ -100,7 +99,6 @@ def detailSizePrice_update_hx_view(request, parent_id=None, id=None):
 		"obj" :instance,
 		'form':form
 	}
-	print(f'form: {form}')
 	if form.is_valid():
 
 		new_obj = form.save(commit=False)
@@ -137,12 +135,21 @@ class QuotationInline():
 
 	def formset_sizeprices_valid(self, formset):
 		sizeprices = formset.save(commit=False)
-
+		print(f'sizeprices: {sizeprices}')
 		for obj in formset.deleted_objects:
 			obj.delete()
-		for sizeprice in sizeprices:
+		for i,sizeprice in enumerate(sizeprices):
 			sizeprice.quotation = self.object
 			sizeprice.save()
+			if formset[i].cleaned_data["net_weight_box"]:
+				if(formset[i].cleaned_data["id"]):
+					netweight = SizePriceBoxNetWeight.objects.filter(sizeprice__id = formset[i]["id"].value()).first()
+					if netweight is not None:
+						netweight.net_weight = formset[i].cleaned_data["net_weight_box"]
+						netweight.save()
+				else:
+					SizePriceBoxNetWeight.objects.create(sizeprice=sizeprice,net_weight=formset[i].cleaned_data["net_weight_box"])
+				#
 
 class QuotationCreate(QuotationInline, CreateView):
 
@@ -150,7 +157,6 @@ class QuotationCreate(QuotationInline, CreateView):
 		ctx = super(QuotationCreate, self).get_context_data(**kwargs)
 		ctx['supplierform'] = SupplierForm(self.request.POST or None)
 		ctx['named_formsets'] = self.get_named_formsets()
-		print(ctx)
 		return ctx
 
 	def get_named_formsets(self):
@@ -166,15 +172,27 @@ class QuotationCreate(QuotationInline, CreateView):
 
 class QuotationUpdate(QuotationInline, UpdateView):
 
-    def get_context_data(self, **kwargs):
-        ctx = super(QuotationUpdate, self).get_context_data(**kwargs)
-        ctx['named_formsets'] = self.get_named_formsets()
-        return ctx
+	def get_context_data(self, **kwargs):
+			ctx = super(QuotationUpdate, self).get_context_data(**kwargs)
+			ctx['named_formsets'] = self.get_named_formsets()
+			return ctx
 
-    def get_named_formsets(self):
-        return {
-            'sizeprices': SizeFormSet(self.request.POST or None, self.request.FILES or None, instance=self.object, prefix='sizeprices'),
-        }
+	def get_named_formsets(self):
+			sizeprices =  SizeFormSet(self.request.POST or None, self.request.FILES or None, instance=self.object, prefix='sizeprices')
+			quotation_id = self.object.id
+			sizeprice_objs = Quotation.objects.get(id=quotation_id).sizeprices.all()
+			sizeprice_objs_list = list(sizeprice_objs)
+			for i,sizeprice in enumerate(sizeprices):
+				if i < len(sizeprice_objs_list):
+					id = sizeprice['id'].value()
+					if sizeprice_objs.get(id=id).netweight.first():
+						netweight = sizeprice_objs.get(id=id).netweight.first()
+						sizeprice.fields['net_weight_box'].widget.attrs.update({'value':netweight})
+				pass
+
+			return {
+					'sizeprices': sizeprices,
+			}
 
 def delete_sizeprice(request, pk):
     try:
@@ -201,3 +219,15 @@ def add_supplier(request):
 			return HttpResponse("Supplier saved successfully")
 		else:
 			return HttpResponse("Form is not valid")
+
+def add_supplier_reload_supplier_dropdown(request):
+	"""Add new supplier then update droplist"""
+	name = request.GET.get('name',None)
+	supplier, created = Supplier.objects.get_or_create(name=name,create_by = request.user)
+	suppliers = Supplier.objects.all()
+	serialized_data = serialize("json", suppliers)
+	serialized_data = json.loads(serialized_data)
+	response = {
+        'suppliers': serialized_data
+    }
+	return JsonResponse(response)
