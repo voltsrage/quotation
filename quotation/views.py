@@ -145,15 +145,23 @@ class QuotationInline():
 			obj.delete()
 		for i,sizeprice in enumerate(sizeprices):
 			sizeprice.quotation = self.object
+			print(sizeprice.price_unit_id)
 			sizeprice.save()
 			if formset[i].cleaned_data["net_weight_box"]:
 				if(formset[i].cleaned_data["id"]):
 					netweight = SizePriceBoxNetWeight.objects.filter(sizeprice__id = formset[i]["id"].value()).first()
 					if netweight is not None:
-						netweight.net_weight = formset[i].cleaned_data["net_weight_box"]
-						netweight.save()
+						if(sizeprice.price_unit_id == 3):
+							netweight.net_weight = formset[i].cleaned_data["net_weight_box"]
+							netweight.save()
+						else:
+							netweight.delete()
+					else:
+						if(sizeprice.price_unit_id == 3):
+							SizePriceBoxNetWeight.objects.create(sizeprice=sizeprice,net_weight=formset[i].cleaned_data["net_weight_box"])
 				else:
-					SizePriceBoxNetWeight.objects.create(sizeprice=sizeprice,net_weight=formset[i].cleaned_data["net_weight_box"])
+					if(sizeprice.price_unit_id == 3):
+						SizePriceBoxNetWeight.objects.create(sizeprice=sizeprice,net_weight=formset[i].cleaned_data["net_weight_box"])
 				#
 
 class QuotationCreate(QuotationInline, CreateView):
