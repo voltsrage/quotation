@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
+from django.core.paginator import Paginator
 from django.http import HttpResponse,Http404
 from django.urls import reverse
 from django.forms.models import modelformset_factory
@@ -68,8 +69,12 @@ def updateQuotation(request, id=None):
 
 def listQuotation(request):
 	obj_list = Quotation.objects.all()
+	paginator = Paginator(obj_list,10)
+	page = request.GET.get('page')
+	data = paginator.get_page(page)
 	context = {
-		"obj_list":obj_list
+		"obj_list":obj_list,
+		"data":data,
 	}
 	return render(request,'quotations/list.html',context)
 
