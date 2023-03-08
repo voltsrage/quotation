@@ -2,7 +2,7 @@ import faker.providers
 import random
 from django.core.management.base import BaseCommand
 from faker import Faker
-from quotation.models import Supplier,Quotation,SizePrice
+from quotation.models import Supplier,Quotation,SizePrice,SizePriceBoxNetWeight
 
 picture_list = [
 	'quotations/products/freshwater-shrimp-species.jpg',
@@ -44,18 +44,34 @@ class Command(BaseCommand):
 
 		fake.add_provider(Provider)
 
-		for _ in range(5000):
-			quotation_id = random.randint(1,1000)
-			create_by_id = 1
-			currency_id = random.randint(1,5)
-			price_unit_id = random.randint(1,4)
-			size = fake.quotation_size()
-			price = (round(random.uniform(0.99,19.99),2))
-			SizePrice.objects.get_or_create(quotation_id=quotation_id,
-				   create_by_id=create_by_id,
-					 currency_id=currency_id,
-					 price_unit_id=price_unit_id,
-					 size=size,price=price)
+		### SizePriceBoxNetWeight Start ###
+
+		# sizeprice_with_box = SizePrice.objects.filter(price_unit_id=3)
+
+		# for sizeprice in sizeprice_with_box:
+		# 	net_weight = (round(random.uniform(0.00,1.99),2))
+		# 	SizePriceBoxNetWeight.objects.get_or_create(sizeprice=sizeprice,net_weight=net_weight)
+
+		### SizePriceBoxNetWeight End ###
+
+		### SizePrice Start ###
+
+		# for _ in range(5000):
+		# 	quotation_id = random.randint(1,1000)
+		# 	create_by_id = 1
+		# 	currency_id = random.randint(1,5)
+		# 	price_unit_id = random.randint(1,4)
+		# 	size = fake.quotation_size()
+		# 	price = (round(random.uniform(0.99,19.99),2))
+		# 	SizePrice.objects.get_or_create(quotation_id=quotation_id,
+		# 		   create_by_id=create_by_id,
+		# 			 currency_id=currency_id,
+		# 			 price_unit_id=price_unit_id,
+		# 			 size=size,price=price)
+
+		### SizePrice End ###
+
+		### Quotation Start ###
 
 		# for _ in range(1000):
 		# 	catch_type_id = random.randint(1,2)
@@ -93,3 +109,4 @@ class Command(BaseCommand):
 		# 			 recieved_date=recieved_date,
 		# 			 packing=packing)
 
+		### Quotation End ###

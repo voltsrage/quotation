@@ -48,26 +48,38 @@
 
             <!-- Pagination -->
             {{data}}
-            <nav>{% if data.has_other_pages %}
+            <nav>
+							{% if data.has_other_pages %}
                 <ul class="pagination">
+
                     {% if data.has_previous %}
-                    <a href="?page=1" class='btn btn-outline-secondary mb-4' style='border-radius: 1px solid #d3d3d3;'>First</a>
-                    <li class='page-item'>
-                        <a href="?page={{data.previous_page_number}}" class='page-link'><i class="fas fa-angle-double-left"></i></a>
-                    </li>
+											<a href="?page=1" class='btn btn-outline-secondary mb-4' style='border-radius: 1px solid #d3d3d3;'>First</a>
+											<li class='page-item'>
+													<a href="?page={{data.previous_page_number}}" class='page-link'><i class="fas fa-angle-double-left"></i></a>
+											</li>
                     {%else%}
-                    <li class="page-item disable"></li>
-                    {% endif%} {% if data.number|add:'-3' > 1 %}
-                    <li><a href="?page={{data.number|add:'-3'}}" class="page-link">&hellip;</a></li>
-                    {%endif%} {%for i in data.paginator.page_range %} {% if data.number == i %}
-                    <li class="page-item active">
-                        <span class="page-link">{{i}} <span class="sr-only"></span></span>
-                    </li>
-                    {% elif i > data.number|add:'-3' and i
-                    < data.number|add: '3' %} <li class="page-item">
-                        <a href="?page={{i}}" class="page-link"></a>
+                    	<li class="page-item disable"></li>
+                    {% endif%}
+
+										{% if data.number|add:'-3' > 1 %}
+											<li>
+												<a href="?page={{data.number|add:'-3'}}" class="page-link">&hellip;</a>
+											</li>
+                    {%endif%}
+
+										{%for i in data.paginator.page_range %}
+											{% if data.number == i %}
+												<li class="page-item active">
+														<span class="page-link">{{i}} <span class="sr-only"></span></span>
+												</li>
+                    	{% elif i > data.number|add:'-3' and i < data.number|add:'3' %}
+												<li class="page-item">
+                        	<a href="?page={{i}}" class="page-link">{{i}}</a>
                         </li>
-                        {%endif%} {%endfor%} {% if data.paginator.num_pages > data.number|add:'2' %}
+                      {%endif%}
+										{%endfor%}
+
+										{% if data.paginator.num_pages > data.number|add:'2' %}
                         <li>
                             <a href="?page={{data.number|add:'2'}}" class="page-link">&hellip;</a>
                         </li>
@@ -77,17 +89,19 @@
                         <li>
                             <a href="?pages={{data.paginator.num_pages}}" class="page-link">{{data.paginator.num_pages}}</a>
                         </li>
-                        {%endif%} {% if data.has_next %}
+                    {% endif %}
 
+										{% if data.has_next %}
                         <li class='page-item'>
                             <a href="?page={{data.next_page_number}}" class='page-link'><i class="fas fa-angle-double-right"></i></a>
                         </li>
                         <a href="?page={{data.paginator.num_pages}}" class='btn btn-outline-secondary mb-4' style='border-radius: 1px solid #d3d3d3;'>Last</a> {%else%}
                         <li class="page-item disable"></li>
-                        {% endif%}
+                    {% endif%}
                 </ul>
 
-                {% endif%}</nav>
+                {% endif%}
+						</nav>
         </div>
     </div>
 </div>
