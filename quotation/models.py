@@ -278,6 +278,9 @@ class Quotation(models.Model):
 	def get_edit_url(self):
 		return reverse('quotation:edit', kwargs={'id':self.id})
 
+	def get_delete_url(self):
+		return reverse('quotation:delete', kwargs={'id':self.id})
+
 	def get_formset_edit_url(self):
 		return reverse('quotation:update_quotation', kwargs={'pk':self.id})
 

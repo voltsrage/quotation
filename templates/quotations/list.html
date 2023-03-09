@@ -28,7 +28,7 @@
                 </thead>
                 <tbody>
                     {% for obj in data %}
-                    <tr>
+                    <tr >
                         <td>{{ obj.specie }}</td>
                         <td>{{ obj.processing_method }}</td>
                         <td>{{ obj.harvesting_method }}</td>
@@ -39,7 +39,7 @@
                         <td>
                             <a href="{{ obj.get_formset_edit_url }}" class='btn btn-sm btn-primary'>Edit</a>
                             <a href="{{ obj.get_absolute_url }}" class='btn btn-sm btn-secondary'>Detail</a>
-                            <button class='btn btn-sm btn-danger'>Delete</button>
+                            <a href="{{ obj.get_delete_url }}" class='btn btn-sm btn-danger' hx-post="{{ obj.get_delete_url }}" hx-confirm='Are you sure you wnat to delete {{obj}}?' hx-trigger='click'>Delete</a>
                         </td>
                     </tr>
                     {% endfor %}

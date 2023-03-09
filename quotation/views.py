@@ -35,6 +35,42 @@ def detailQuotation(request, id=None):
 	}
 	return render(request,'quotations/details.html',context)
 
+def deleteQuotation(request, id=None):
+	try:
+		obj = Quotation.objects.get(id=id)
+	except:
+		obj = None
+	if obj is None:
+		if request.htmx:
+			return HttpResponse("Not Found")
+		raise Http404
+	if request.method == "POST":
+		obj.delete()
+		success_url = reverse('quotation:list')
+		if request.htmx:
+			headers = {
+				'HX-Redirect': success_url
+			}
+			return HttpResponse("Success", headers=headers)
+		return redirect(success_url)
+	context = {
+		"obj" :obj
+	}
+	return render(request,'quotations/delete.html',context)
+
+# def deleteQuotation(request, id=None):
+# 	obj = get_object_or_404(Quotation, id=id)
+# 	print(obj)
+# 	if request.method == "POST":
+# 		print(f'obj delete: {obj}')
+# 		obj.delete()
+# 		success_url = reverse('quotation:list')
+# 		return redirect(success_url)
+# 	context = {
+# 		"obj" :obj
+# 	}
+# 	return render(request,'quotations/delete.html',context)
+
 def detailQuotation_hx(request, id=None):
 	if not request.htmx:
 		raise Http404
@@ -140,12 +176,10 @@ class QuotationInline():
 
 	def formset_sizeprices_valid(self, formset):
 		sizeprices = formset.save(commit=False)
-		print(f'sizeprices: {sizeprices}')
 		for obj in formset.deleted_objects:
 			obj.delete()
 		for i,sizeprice in enumerate(sizeprices):
 			sizeprice.quotation = self.object
-			print(sizeprice.price_unit_id)
 			sizeprice.save()
 			if formset[i].cleaned_data["net_weight_box"]:
 				if(formset[i].cleaned_data["id"]):

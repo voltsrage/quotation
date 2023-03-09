@@ -3,6 +3,7 @@ import random
 from django.core.management.base import BaseCommand
 from faker import Faker
 from quotation.models import Supplier,Quotation,SizePrice,SizePriceBoxNetWeight
+from django.db.models import Avg,Max,Min,Sum,Count
 
 picture_list = [
 	'quotations/products/freshwater-shrimp-species.jpg',
@@ -43,6 +44,49 @@ class Command(BaseCommand):
 		fake = Faker()
 
 		fake.add_provider(Provider)
+
+		get_all_quotations = Quotation.objects.all()
+		#print(get_all_quotations)
+
+		get_quotation_by_primary_key = Quotation.objects.get(pk=5)
+		#print(get_quotation_by_primary_key)
+
+		get_the_origin_of_quotation_with_id_5 = Quotation.objects.get(id=5).origin
+		#print(get_the_origin_of_quotation_with_id_5)
+
+		get_all_the_quotations_recd_in_year_2020 = Quotation.objects.filter(recieved_date__year=2020)
+		#print(get_all_the_quotations_recd_in_year_2020)
+
+		get_all_the_quotations_recd_in_year_2020_with_destination_starting_with_M = Quotation.objects.filter(recieved_date__year=2020).filter(destination__name__istartswith='M')
+		#print(get_all_the_quotations_recd_in_year_2020_with_destination_starting_with_M)
+
+		get_all_quotations_with_sizeprices_gte_10_dollars = Quotation.objects.filter(sizeprices__price__gte=10.00)
+		#print(f'get_all_quotations_with_sizeprices_gte_10_dollars: {get_all_quotations_with_sizeprices_gte_10_dollars}')
+
+		# get_first_ten_quotations = Quotation.objects.all()[:10]
+		# print(f'get_first_ten_quotations: {get_first_ten_quotations}')
+
+		# get_first_ten_quotations_ordered_by_destination = Quotation.objects.order_by('destination')[:10]
+		# print(f'get_first_ten_quotations_ordered_by_destination: {get_first_ten_quotations_ordered_by_destination}')
+
+		# get_ten_to_twenty_quotations = Quotation.objects.all()[10:20]
+		# print(f'get_ten_to_twenty_quotations: {get_ten_to_twenty_quotations}')
+
+		# get_quotation_with_sizeprice_netweight_gte_1 = Quotation.objects.filter(sizeprices__netweight__net_weight__gte=1.00)
+		# print(f'get_quotation_with_sizeprice_netweight_gte_1: {get_quotation_with_sizeprice_netweight_gte_1}')
+
+		get_top_10_suppliers_with_the_highest_price = Supplier.objects.annotate(supplier_max = Max('quotation__sizeprices__price')).order_by('-supplier_max')[:10]
+		#print(f'test: {test}')
+
+		for i,t in enumerate(get_top_10_suppliers_with_the_highest_price):
+					print(f't{1}: {vars(get_top_10_suppliers_with_the_highest_price[i])}')
+
+		# quotations = Quotation.objects.all()
+
+		# for quote in quotations:
+		# 	quote.recieved_date = fake.date_between(start_date='-10y',
+    #                           end_date='today')
+		# 	quote.save()
 
 		### SizePriceBoxNetWeight Start ###
 

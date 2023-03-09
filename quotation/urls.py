@@ -8,6 +8,7 @@ from .views import (
 	detailQuotation_hx,
 	updateQuotation,
 	detailQuotation,
+  deleteQuotation,
   QuotationCreate,
 	delete_sizeprice,
   QuotationUpdate,
@@ -26,7 +27,8 @@ urlpatterns = [
 	path('hx/<int:parent_id>/sizeprice/<int:id>/', detailSizePrice_update_hx_view, name='hx-sizeprice-detail'),
 	path("hx/<int:parent_id>/sizeprice/", detailSizePrice_update_hx_view, name='hx-sizeprices-create'),
 	path('hx/<int:id>/', detailQuotation_hx, name='hx-detail'),
-	path('<int:id>/edit', updateQuotation, name='edit'),
+	path('<int:id>/edit/', updateQuotation, name='edit'),
+  path('<int:id>/delete/', deleteQuotation, name='delete'),
 	path('<int:id>/', detailQuotation, name='detail'),
 	path('add_supplier_reload', add_supplier_reload_supplier_dropdown, name='add_supplier_reload')
 ]
