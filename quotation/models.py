@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+from decimal import Decimal
 
 # Create your models here.
 class LogInfo(models.Model):
@@ -304,6 +305,26 @@ class SizePrice(models.Model):
 			on_delete=models.DO_NOTHING,null=True, blank=True
 		)
 	create_at = models.DateTimeField(auto_now_add=True)
+
+	def price_in_kg(self):
+		if self.price_unit_id == 1:
+			return self.price
+		elif self.price_unit_id == 2:
+			return round(self.price * Decimal(2.2),2)
+		elif self.price_unit_id == 3:
+			return round(self.price / self.netweight.get(sizeprice=self).net_weight,2)
+		else:
+			return 0
+
+	def price_in_lb(self):
+		if self.price_unit_id == 1:
+			return round(self.price / Decimal(2.2),2)
+		elif self.price_unit_id == 2:
+			return self.price
+		elif self.price_unit_id == 3:
+			return round((self.price / self.netweight.get(sizeprice=self).net_weight) / Decimal(2.2),2)
+		else:
+			return 0
 
 	def get_hx_edit_url(self):
 		kwargs = {

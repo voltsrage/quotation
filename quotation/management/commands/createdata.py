@@ -2,8 +2,10 @@ import faker.providers
 import random
 from django.core.management.base import BaseCommand
 from faker import Faker
-from quotation.models import Supplier,Quotation,SizePrice,SizePriceBoxNetWeight
-from django.db.models import Avg,Max,Min,Sum,Count
+from quotation.models import Supplier,Quotation,SizePrice,SizePriceBoxNetWeight,Specie,Country,Port
+from django.db.models import Avg,Max,Min,Sum,Count, Q,F,Case, Value, When,ExpressionWrapper, DecimalField
+from django.db import connection
+from decimal import Decimal
 
 picture_list = [
 	'quotations/products/freshwater-shrimp-species.jpg',
@@ -45,22 +47,104 @@ class Command(BaseCommand):
 
 		fake.add_provider(Provider)
 
-		get_all_quotations = Quotation.objects.all()
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
+
+		# # Total Quotations for each supplier
+
+		# supplier_quotes = Supplier.objects.annotate(num_or_quotes=Count('quotation'))
+
+		# for i,quote in enumerate(supplier_quotes):
+		# 	print(f'{supplier_quotes[i].name} - {supplier_quotes[i].num_or_quotes}')
+
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
+		# # Total Quotations from each Specie
+
+		# specie_quotes = Specie.objects.annotate(num_or_quotes=Count('quotation'))
+
+		# for i,quote in enumerate(specie_quotes):
+		# 	print(f'{specie_quotes[i].name} - {specie_quotes[i].num_or_quotes}')
+
+
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
+		# # Total Quotations for each Destination
+
+		# destination_quotes = Port.objects.annotate(num_or_quotes=Count('quotation'))
+
+		# for i,quote in enumerate(destination_quotes):
+		# 	print(f'{destination_quotes[i].name} - {destination_quotes[i].num_or_quotes}')
+
+		# """
+		# 	[{'sql': 'SELECT "quotation_supplier"."id", "quotation_supplier"."name", "quotation_supplier"."create_by_id",
+    # "quotation_supplier"."create_at", COUNT("quotation_quotation"."id") AS "num_or_quotes" FROM "quotation_supplier"
+		# LEFT OUTER JOIN "quotation_quotation" ON ("quotation_supplier"."id" = "quotation_quotation"."supplier_id")
+		# GROUP BY "quotation_supplier"."id"', 'time': '0.017'},
+
+		# 	{'sql': 'SELECT "quotation_specie"."id", "quotation_specie"."name", "quotation_specie"."animal_id", "quotation_specie"."create_by_id",
+		# "quotation_specie"."create_at", COUNT("quotation_quotation"."id") AS "num_or_quotes"
+		# FROM "quotation_specie"
+		# LEFT OUTER JOIN "quotation_quotation" ON ("quotation_specie"."id" = "quotation_quotation"."specie_id")
+		# GROUP BY "quotation_specie"."id"', 'time': '0.007'},
+
+		# {'sql': 'SELECT "quotation_port"."id", "quotation_port"."name", "quotation_port"."country_id", "quotation_port"."country_name",
+		# 	"quotation_port"."latlong", "quotation_port"."telephone", "quotation_port"."web", "quotation_port"."code", "quotation_port"."create_by_id",
+		# 	"quotation_port"."create_at", COUNT("quotation_quotation"."id") AS "num_or_quotes"
+		# 	FROM "quotation_port"
+		# 	LEFT OUTER JOIN "quotation_quotation" ON ("quotation_port"."id" = "quotation_quotation"."destination_id")
+		# 		GROUP BY "quotation_port"."id"', 'time': '0.027'}]
+		# """
+
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
+		# # Total Quotations with taxes greater than 15 for each species
+
+		# above_15 = Count('quotation', filter=Q(quotation__tax__gt=15))
+		# Specie_quotes = Specie.objects.annotate(above_15=above_15)
+
+		# for i,quote in enumerate(Specie_quotes):
+		# 	print(f'{Specie_quotes[i].name} - {Specie_quotes[i].above_15}')
+
+		# """
+		# [{'sql': 'SELECT "quotation_specie"."id", "quotation_specie"."name", "quotation_specie"."animal_id", "quotation_specie"."create_by_id",
+		# "quotation_specie"."create_at", COUNT("quotation_quotation"."id")
+		# FILTER (WHERE "quotation_quotation"."tax" > 15) AS "above_15"
+		# FROM "quotation_specie"
+		# LEFT OUTER JOIN "quotation_quotation" ON ("quotation_specie"."id" = "quotation_quotation"."specie_id")
+		# GROUP BY "quotation_specie"."id"', 'time': '0.017'}]
+		# """
+
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
+		# # Total Quotations with taxes greater than 15 for each shipped from country using related_name
+
+		# above_15 = Count('shipped_from', filter=Q(shipped_from__tax__gt=15))
+		# shipped_from_quotes = Country.objects.annotate(above_15=above_15)
+
+		# for i,quote in enumerate(shipped_from_quotes):
+		# 	print(f'{shipped_from_quotes[i].name} - {shipped_from_quotes[i].above_15}')
+		#get_all_quotations = Quotation.objects.all()
 		#print(get_all_quotations)
 
-		get_quotation_by_primary_key = Quotation.objects.get(pk=5)
+		#get_quotation_by_primary_key = Quotation.objects.get(pk=5)
 		#print(get_quotation_by_primary_key)
 
-		get_the_origin_of_quotation_with_id_5 = Quotation.objects.get(id=5).origin
+		#get_the_origin_of_quotation_with_id_5 = Quotation.objects.get(id=5).origin
 		#print(get_the_origin_of_quotation_with_id_5)
 
-		get_all_the_quotations_recd_in_year_2020 = Quotation.objects.filter(recieved_date__year=2020)
+		#get_all_the_quotations_recd_in_year_2020 = Quotation.objects.filter(recieved_date__year=2020)
 		#print(get_all_the_quotations_recd_in_year_2020)
 
-		get_all_the_quotations_recd_in_year_2020_with_destination_starting_with_M = Quotation.objects.filter(recieved_date__year=2020).filter(destination__name__istartswith='M')
+		#get_all_the_quotations_recd_in_year_2020_with_destination_starting_with_M = Quotation.objects.filter(recieved_date__year=2020).filter(destination__name__istartswith='M')
 		#print(get_all_the_quotations_recd_in_year_2020_with_destination_starting_with_M)
 
-		get_all_quotations_with_sizeprices_gte_10_dollars = Quotation.objects.filter(sizeprices__price__gte=10.00)
+		#get_all_quotations_with_sizeprices_gte_10_dollars = Quotation.objects.filter(sizeprices__price__gte=10.00)
 		#print(f'get_all_quotations_with_sizeprices_gte_10_dollars: {get_all_quotations_with_sizeprices_gte_10_dollars}')
 
 		# get_first_ten_quotations = Quotation.objects.all()[:10]
@@ -75,12 +159,104 @@ class Command(BaseCommand):
 		# get_quotation_with_sizeprice_netweight_gte_1 = Quotation.objects.filter(sizeprices__netweight__net_weight__gte=1.00)
 		# print(f'get_quotation_with_sizeprice_netweight_gte_1: {get_quotation_with_sizeprice_netweight_gte_1}')
 
-		get_top_10_suppliers_with_the_highest_price = Supplier.objects.annotate(supplier_max = Max('quotation__sizeprices__price')).order_by('-supplier_max')[:10]
+		#get_top_10_suppliers_with_the_highest_price = Supplier.objects.annotate(supplier_max = Max('quotation__sizeprices__price')).order_by('-supplier_max')[:10]
+
+		#get_top_10_suppliers_with_the_loeest_price = Supplier.objects.annotate(supplier_max = Min('quotation__sizeprices__price')).order_by('supplier_max')[:10]
 		#print(f'test: {test}')
 
-		for i,t in enumerate(get_top_10_suppliers_with_the_highest_price):
-					print(f't{1}: {vars(get_top_10_suppliers_with_the_highest_price[i])}')
+		# for i,t in enumerate(get_top_10_suppliers_with_the_highest_price):
+		# 			print(f't{1}: {vars(get_top_10_suppliers_with_the_highest_price[i])}')
 
+		# print()
+
+		# for i,t in enumerate(get_top_10_suppliers_with_the_loeest_price):
+		# 			print(f't{1}: {vars(get_top_10_suppliers_with_the_loeest_price[i])}')
+
+
+		## Or Statemens
+
+		#get_or_statement = Supplier.objects.filter(name__startswith='Ma') | Supplier.objects.filter(name__startswith='E')
+
+		#get_or_statement2 = Supplier.objects.filter(Q(name__startswith='Ma') | Q(name__startswith='E') )
+
+		#get_supplier_who_not_start_with_ma = Supplier.objects.filter(~Q(name__startswith='Ma') )
+
+
+
+
+		## And Statemens
+
+		#get_or_statement = Supplier.objects.filter(name__startswith='Ma') & Supplier.objects.filter(name__startswith='E')
+
+		#get_or_statement2 = Supplier.objects.filter(Q(name__startswith='Ma') & Q(name__startswith='E') )
+
+		# use value list to get only specific columns from the list
+		#get_supplier_value_list = Supplier.objects.all().values_list("name")
+
+		#get_quotation_value_list = Quotation.objects.all().values_list("destination","supplier", 'tax' ,'recieved_date')
+
+			# use value list to get only specific columns directly from the db
+
+		# get_quotation_value_list = Quotation.objects.all().only("destination","supplier", 'tax' ,'recieved_date')
+		# print(get_quotation_value_list)
+
+		print()
+		print('-----------------------------------------------------------------------')
+		print()
+
+		get_kg_sizeprice = Quotation.objects.all()[:10]
+
+		# get_kg_sizeprice = Quotation.objects.filter(Q(sizeprices__price_unit_id=3) | Q(sizeprices__price_unit_id=2) | Q(sizeprices__price_unit_id=1) ).annotate(
+		# 	price_in_kg = Case(
+		# 		When(sizeprices__price_unit_id=1, then='sizeprices__price'),
+		# 		When(sizeprices__price_unit_id=2, then=ExpressionWrapper(F("sizeprices__price")*Decimal(2.2),output_field=DecimalField())),
+		# 		When(sizeprices__price_unit_id=3, then=F('sizeprices__price')/F('sizeprices__netweight__net_weight')),
+		# 	)
+		# ).values('id','supplier','sizeprices__size','sizeprices__price','price_in_kg')[:10]
+		for y in get_kg_sizeprice:
+			list = [{
+							'quotation_id':y.id,
+	    				 'supplier':y.supplier.name,
+	    				 'destination':y.destination.name,
+							 'origin':y.origin.name,
+							 'sizeprice_id':x.id,
+	    				 'size':x.size,
+							 'price_unit':x.price_unit.name,
+							 'original_price':x.price,
+							 'price_in_kg':x.price_in_kg(),
+							 'price_in_lb':x.price_in_lb()
+							 }
+							for x in y.sizeprices.all()[:10]]
+			for sizeprice in list:
+				print(sizeprice)
+
+		# # The average, max and min tax required on quotations
+
+		# avg_tax = Quotation.objects.filter(specie__name='Amano Shrimp').aggregate(Avg('tax'), Max('tax'), Min('tax'))
+		# print(avg_tax)
+
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
+
+		# # The get the supplier with the lowest price
+
+		# min_price_each_supplier = Supplier.objects.aggregate(lowest_price=Min('quotation__sizeprices__price'))
+		# print(min_price_each_supplier)
+
+		#print(Specie.objects.all().values_list())
+
+		print()
+		#print(connection.queries)
+		print()
+
+		## Union Statemens
+
+		# get_or_statement = Supplier.objects.filter(name__startswith='Ma').values("name").union(
+		# 	 Supplier.objects.filter(name__startswith='E').values("name")
+		# )
+
+		# print(get_or_statement)
 		# quotations = Quotation.objects.all()
 
 		# for quote in quotations:
