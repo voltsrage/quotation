@@ -213,22 +213,62 @@ class Command(BaseCommand):
 		# 		When(sizeprices__price_unit_id=3, then=F('sizeprices__price')/F('sizeprices__netweight__net_weight')),
 		# 	)
 		# ).values('id','supplier','sizeprices__size','sizeprices__price','price_in_kg')[:10]
-		for y in get_kg_sizeprice:
-			list = [{
-							'quotation_id':y.id,
-	    				 'supplier':y.supplier.name,
-	    				 'destination':y.destination.name,
-							 'origin':y.origin.name,
-							 'sizeprice_id':x.id,
-	    				 'size':x.size,
-							 'price_unit':x.price_unit.name,
-							 'original_price':x.price,
-							 'price_in_kg':x.price_in_kg(),
-							 'price_in_lb':x.price_in_lb()
-							 }
-							for x in y.sizeprices.all()[:10]]
-			for sizeprice in list:
-				print(sizeprice)
+		# for y in get_kg_sizeprice:
+		# 	list = [{
+		# 					'quotation_id':y.id,
+	  #   				 'supplier':y.supplier.name,
+	  #   				 'destination':y.destination.name,
+		# 					 'origin':y.origin.name,
+		# 					 'sizeprice_id':x.id,
+	  #   				 'size':x.size,
+		# 					 'price_unit':x.price_unit.name,
+		# 					 'original_price':x.price,
+		# 					 'price_in_kg':x.price_in_kg(),
+		# 					 'price_in_lb':x.price_in_lb()
+		# 					 }
+		# 					for x in y.sizeprices.all()[:10]]
+		# 	for sizeprice in list:
+		# 		print(sizeprice)
+
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
+
+		# quotes_yearly = Quotation.objects.all().values('recieved_date__year').annotate(num_of_quotes=Count("id")).order_by('recieved_date__year')
+
+		# print(quotes_yearly)
+
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
+
+		# quotes_monthly = Quotation.objects.filter(recieved_date__year=2023).values('recieved_date__month').annotate(num_of_quotes=Count("id")).order_by('recieved_date__month')
+
+		# print(quotes_monthly)
+
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
+
+		# quotes_yearlY_monthly = Quotation.objects.all().values('recieved_date__year','recieved_date__month').annotate(num_of_quotes=Count("id")).order_by('recieved_date__year','recieved_date__month')
+
+		# print(quotes_yearlY_monthly)
+
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
+
+		# supplier_quotes_yearly = Quotation.objects.all().values('supplier__name','recieved_date__year').annotate(num_of_quotes=Count("id")).order_by('supplier','recieved_date__year')
+
+		# print(supplier_quotes_yearly)
+
+		print()
+		print('-----------------------------------------------------------------------')
+		print()
+
+		quotes_yearly = Quotation.objects.all().values('recieved_date__year').annotate(num_of_quotes=Avg(F("sizeprices__price"))).order_by('recieved_date__year')
+
+		print(quotes_yearly)
 
 		# # The average, max and min tax required on quotations
 
@@ -247,7 +287,7 @@ class Command(BaseCommand):
 		#print(Specie.objects.all().values_list())
 
 		print()
-		#print(connection.queries)
+		print(connection.queries)
 		print()
 
 		## Union Statemens
