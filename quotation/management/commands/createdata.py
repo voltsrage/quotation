@@ -266,9 +266,49 @@ class Command(BaseCommand):
 		print('-----------------------------------------------------------------------')
 		print()
 
-		quotes_yearly = Quotation.objects.all().values('recieved_date__year').annotate(num_of_quotes=Avg(F("sizeprices__price"))).order_by('recieved_date__year')
+		quotes_yearly = Quotation.objects.all().values('recieved_date__year').annotate(
+			num_of_quotes=Avg(Case (
+				When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
+				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
+				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
+				default=Decimal(0.0))
+			)
+			).order_by('recieved_date__year')
 
 		print(quotes_yearly)
+
+		print()
+		print('-----------------------------------------------------------------------')
+		print()
+
+		quotes_by_specie_yearly = Quotation.objects.all().values('recieved_date__year','specie__name').annotate(
+			num_of_quotes=Avg(Case (
+				When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
+				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
+				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
+				default=Decimal(0.0))
+			)
+			).order_by('recieved_date__year','specie__id')
+
+		for quotes in quotes_by_specie_yearly:
+			print(quotes)
+
+
+		print()
+		print('-----------------------------------------------------------------------')
+		print()
+
+		quotes_by_origin_specie_yearly = Quotation.objects.all().values('recieved_date__year','origin__name','specie__name').annotate(
+			num_of_quotes=Avg(Case (
+				When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
+				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
+				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
+				default=Decimal(0.0))
+			)
+			).order_by('recieved_date__year','origin__name','specie__name')
+
+		for quotes in quotes_by_origin_specie_yearly:
+			print(quotes)
 
 		# # The average, max and min tax required on quotations
 

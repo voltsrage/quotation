@@ -10,6 +10,9 @@ from django.views.generic import ListView
 from django.core.serializers import serialize
 import json
 from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+from django.db.models import Avg,Max,Min,Sum,Count, Q,F,Case, Value, When,ExpressionWrapper, DecimalField
+from decimal import Decimal
 from django.views.generic.edit import (
     CreateView, UpdateView
 )
@@ -278,3 +281,156 @@ def add_supplier_reload_supplier_dropdown(request):
         'suppliers': serialized_data
     }
 	return JsonResponse(response)
+
+
+@require_GET
+def quotation_chart_data(request):
+		supplier = request.GET.get('supplier', '')
+		origin = request.GET.get('origin', '')
+		destination = request.GET.get('destination', '')
+		specie = request.GET.get('specie', '')
+		incoterm = request.GET.get('incoterm', '')
+		shipped_from = request.GET.get('shipped_from', '')
+
+		queryset = Quotation.objects.all()
+
+		if supplier:
+				queryset = queryset.filter(supplier=supplier)
+
+		if origin:
+				queryset = queryset.filter(origin=origin)
+
+		if destination:
+				queryset = queryset.filter(destination=destination)
+
+		if specie:
+				queryset = queryset.filter(specie=specie)
+
+		if incoterm:
+				queryset = queryset.filter(incoterm=incoterm)
+
+		if shipped_from:
+				queryset = queryset.filter(shipped_from=shipped_from)
+
+		data = queryset.values('recieved_date__year','recieved_date__month').annotate(
+			avg_price=Avg(Case (
+				When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
+				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
+				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
+				default=Decimal(0.0))
+			)).order_by('recieved_date__year','recieved_date__month')
+
+		labels = []
+		for item in data:
+			year = item['recieved_date__year']
+			month = item['recieved_date__month']
+			if month < 10:
+				month = f'0{month}'
+			labels.append(f'{year}-{month}')
+
+		prices = [round(item['avg_price'],2) for item in data]
+
+		return JsonResponse({
+				'labels': labels,
+				'prices': prices
+		})
+
+def price_chart_data_multiple(request):
+		selected_suppliers  = request.GET.getlist('suppliers[]')
+		selected_origins  = request.GET.getlist('origins[]')
+		selected_species  = request.GET.getlist('species[]')
+		selected_incoterms  = request.GET.getlist('incoterms[]')
+		selected_years   = request.GET.getlist('years[]')
+
+		years_filter = Quotation.objects.filter(
+			recieved_date__year__in=selected_years
+			)
+
+		if len(selected_suppliers) > 0:
+			print('has suppliers')
+			years_filter = years_filter.filter(Q(supplier__in=selected_suppliers))
+
+		if len(selected_origins) > 0:
+			print('has origins')
+			years_filter = years_filter.filter(Q(origin__in=selected_origins))
+
+		if len(selected_species) > 0:
+			print('has species')
+			years_filter = years_filter.filter(Q(specie__in=selected_species))
+
+		if len(selected_incoterms) > 0:
+			print('has incoterms')
+			years_filter = years_filter.filter(Q(incoterm__in=selected_incoterms))
+
+		prices = years_filter
+		datasets = []
+		dataset_borderColors = ['rgba(0,110,185, 1)',
+		    'rgba(242,108,82, 1)',
+				'rgba(0,48,70, 1)',
+				'rgba(0, 125, 137, 1)',
+				'rgba(255,205,52, 1)',
+				'rgba(63,191,176, 1)',
+				'rgba(162,38,21, 1)',
+				'rgba(34,192,241, 1)',
+				'rgba(171,127,25, 1)',
+				'rgba(236,233,36, 1)',
+				'rgba(115,184,101, 1)',
+				'rgba(95,100,106, 1)',]
+
+		dataset_backgroundColors = ['rgba(0,110,185, 0.1)',
+		    'rgba(242,108,82, 0.1)',
+				'rgba(0,48,70, 0.1)',
+				'rgba(0, 125, 137, 0.1)',
+				'rgba(255,205,52, 0.1)',
+				'rgba(63,191,176, 0.1)',
+				'rgba(162,38,21, 0.1)',
+				'rgba(34,192,241, 0.1)',
+				'rgba(171,127,25, 0.1)',
+				'rgba(236,233,36, 0.1)',
+				'rgba(115,184,101, 0.1)',
+				'rgba(95,100,106, 0.1)']
+
+		for i,year in enumerate(selected_years):
+			prices_year = prices.filter(recieved_date__year=year)
+			data = []
+			for month in range(1, 13):
+					prices_month = prices_year.filter(recieved_date__month=month)
+					if prices_month.exists():
+						average_price = prices_month.aggregate(
+							avg_price=Avg(Case (
+								When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
+								When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
+								When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
+								default=Decimal(0.0))
+							))['avg_price']
+
+						data.append(round(average_price, 2))
+					else:
+							data.append(0)
+			dataset = {
+						'label': str(year),
+						'data': data,
+						'borderColor': dataset_borderColors[i],
+						'backgroundColor': dataset_backgroundColors[i]
+				}
+			datasets.append(dataset)
+
+		labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+		data = {
+				'labels': labels,
+				'datasets': datasets
+		}
+		options = {
+				'scales': {
+						'yAxes': [{
+								'ticks': {
+										'beginAtZero': True
+								}
+						}]
+				}
+		}
+
+		return JsonResponse({
+			'data': data, 'options': options
+		})
+
