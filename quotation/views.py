@@ -13,6 +13,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from django.db.models import Avg,Max,Min,Sum,Count, Q,F,Case, Value, When,ExpressionWrapper, DecimalField
 from decimal import Decimal
+import datetime
 from django.views.generic.edit import (
     CreateView, UpdateView
 )
@@ -291,6 +292,15 @@ def quotation_chart_data(request):
 		specie = request.GET.get('specie', '')
 		incoterm = request.GET.get('incoterm', '')
 		shipped_from = request.GET.get('shipped_from', '')
+		startDate = request.GET.get('startDate', '')
+		endDate = request.GET.get('endDate', '')
+
+		if startDate:
+			startDate = datetime.datetime.strptime(startDate, '%d/%m/%Y').date()
+			print(startDate)
+		if endDate:
+			endDate = datetime.datetime.strptime(endDate, '%d/%m/%Y').date()
+			print(endDate)
 
 		queryset = Quotation.objects.all()
 

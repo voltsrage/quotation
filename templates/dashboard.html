@@ -74,6 +74,11 @@
 
 <canvas id="chart" height='100px'></canvas>
 
+<div class='my-4'>
+	<label for="date-slider">Select Date Range:</label>
+	<input type="text" id="date-slider" name="date-range" />
+</div>
+
 <div class="pt-3 pb-2 mb-3 border-bottom border-top">
 
 	<form id="filter-form" class="row g-3">
@@ -159,9 +164,13 @@
 
 <h2>Section title</h2>
 
-<script src="https://code.jquery.com/jquery-2.2.4.min.js" type="text/javascript"></script>
+<script
+  src="https://code.jquery.com/jquery-3.6.4.min.js"
+  integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
+  crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.1/dist/chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
 <script>
 	$(document).ready(function() {
 		$('#origin').select2();
@@ -176,6 +185,57 @@
 		$('#supplierM').select2();
 		$('#specieM').select2();
 		$('#incotermM').select2();
+
+		var dateRange = $('#date-slider');
+
+		$("#date-slider").ionRangeSlider({
+      type: "double",
+      grid: true,
+      min: new Date(`{{ date_range.min }}`).getTime(),
+      max: new Date(`{{ date_range.max }}`).getTime(),
+      from: new Date(`{{ date_range.min }}`).getTime(),
+      to: new Date(`{{ date_range.max }}`).getTime(),
+      prettify: function(num) {
+        var d = new Date(num);
+        var year = d.getFullYear();
+        var month = d.getMonth() + 1;
+        var day = d.getDate();
+        return day + "/" + month + "/" + year;
+      },
+			onFinish : function(data) {
+				console.log(data.from_pretty)
+				console.log(data.to_pretty)
+				console.log(data.from)
+				console.log(data.to)
+
+				var supplier = $('#supplier').val();
+				var origin = $('#origin').val();
+				var destination = $('#destination').val();
+				var specie = $('#specie').val();
+				var shipped_from = $('#shipped_from').val();
+				var incoterm = $('#incoterm').val();
+
+				$.ajax({
+					url: '/quotations/chart-data/',
+					data: {
+						'supplier': supplier,
+						'origin': origin,
+						'destination': destination,
+						'specie': specie,
+						'shipped_from': shipped_from,
+						'incoterm': incoterm,
+						'startDate': data.from_pretty,
+						'endDate': data.to_pretty
+					},
+					dataType: 'json',
+					success: function(data) {
+						chart.data.labels = data.labels;
+						chart.data.datasets[0].data = data.prices;
+						chart.update();
+					}
+				});
+			}
+    });
 
 		var ctx = document.getElementById('chart').getContext('2d');
 
@@ -259,6 +319,8 @@
 		$('#filter-form').submit(function(event) {
 			event.preventDefault();
 
+
+
 			var selectedSuppliers = $('#supplierM').val();
 			var selectedOrigins = $('#originM').val();
 			var selectedYears = $('#yearM').val();
@@ -317,6 +379,10 @@
 				}
 			});
 		});
+
+		dateRange.on('finish',function(){
+			print('detect')
+		})
 	})
 
 </script>
