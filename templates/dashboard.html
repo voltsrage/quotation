@@ -203,10 +203,6 @@
         return day + "/" + month + "/" + year;
       },
 			onFinish : function(data) {
-				console.log(data.from_pretty)
-				console.log(data.to_pretty)
-				console.log(data.from)
-				console.log(data.to)
 
 				var supplier = $('#supplier').val();
 				var origin = $('#origin').val();
@@ -354,6 +350,8 @@
 		$('#filters').submit(function(e) {
 			e.preventDefault();
 
+			var dateRangeVar = dateRange.data("ionRangeSlider").result;
+
 			var supplier = $('#supplier').val();
 			var origin = $('#origin').val();
 			var destination = $('#destination').val();
@@ -370,6 +368,8 @@
 					'specie': specie,
 					'shipped_from': shipped_from,
 					'incoterm': incoterm,
+					'startDate': dateRangeVar.from_pretty,
+					'endDate': dateRangeVar.to_pretty
 				},
 				dataType: 'json',
 				success: function(data) {

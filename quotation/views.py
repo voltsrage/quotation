@@ -295,14 +295,14 @@ def quotation_chart_data(request):
 		startDate = request.GET.get('startDate', '')
 		endDate = request.GET.get('endDate', '')
 
+		queryset = Quotation.objects.all()
+
 		if startDate:
 			startDate = datetime.datetime.strptime(startDate, '%d/%m/%Y').date()
-			print(startDate)
+			queryset = queryset.filter(recieved_date__gte=startDate)
 		if endDate:
 			endDate = datetime.datetime.strptime(endDate, '%d/%m/%Y').date()
-			print(endDate)
-
-		queryset = Quotation.objects.all()
+			queryset = queryset.filter(recieved_date__lte=endDate)
 
 		if supplier:
 				queryset = queryset.filter(supplier=supplier)
@@ -403,6 +403,8 @@ def price_chart_data_multiple(request):
 		for i,year in enumerate(selected_years):
 			prices_year = prices.filter(recieved_date__year=year)
 			data = []
+			data_wk = []
+			data_qt = []
 			for month in range(1, 13):
 					prices_month = prices_year.filter(recieved_date__month=month)
 					if prices_month.exists():
@@ -417,6 +419,50 @@ def price_chart_data_multiple(request):
 						data.append(round(average_price, 2))
 					else:
 							data.append(0)
+
+			for week in range(1, 53):
+					prices_week = prices_year.filter(recieved_date__week=week)
+					if prices_week.exists():
+						average_price = prices_week.aggregate(
+							avg_price=Avg(Case (
+								When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
+								When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
+								When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
+								default=Decimal(0.0))
+							))['avg_price']
+
+						data_wk.append(round(average_price, 2))
+					else:
+							data_wk.append(0)
+
+			for quarter in range(1, 5):
+					prices_quarter = prices_year.filter(recieved_date__quarter=quarter)
+					if prices_quarter.exists():
+						average_price = prices_quarter.aggregate(
+							avg_price=Avg(Case (
+								When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
+								When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
+								When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
+								default=Decimal(0.0))
+							))['avg_price']
+
+						data_qt.append(round(average_price, 2))
+					else:
+							data_qt.append(0)
+			print()
+			print('-------------------------------------------------------------')
+			print(data)
+			print()
+			print('-------------------------------------------------------------')
+			print()
+			print(data_wk)
+			print()
+			print('-------------------------------------------------------------')
+			print()
+			print(data_qt)
+			print()
+			print('-------------------------------------------------------------')
+			print()
 			dataset = {
 						'label': str(year),
 						'data': data,
