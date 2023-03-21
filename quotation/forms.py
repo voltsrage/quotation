@@ -78,3 +78,6 @@ class QuotationFilterForm(forms.Form):
 	origin = forms.ModelChoiceField(queryset=Country.objects.all(), required=False)
 	destination = forms.ModelChoiceField(queryset=Port.objects.all(), required=False)
 	years =forms.ModelChoiceField(queryset= Quotation.objects.order_by('recieved_date__year').values_list('recieved_date__year', flat=True).distinct(), required=False)
+	start_date = forms.DateField(input_formats='%Y,%m,%d',widget=forms.DateInput(attrs={'type':'date','class': 'form-control'}), required=False)
+	end_date = forms.DateField(input_formats='%Y,%m,%d',widget=forms.DateInput(attrs={'type':'date','class': 'form-control'}), required=False)
+

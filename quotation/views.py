@@ -115,10 +115,19 @@ def listQuotation(request):
 	selected_destinations  = request.GET.getlist('destinations[]')
 	selected_processingMethods   = request.GET.getlist('processingMethods[]')
 	selected_harvestingMethods = request.GET.getlist('harvestingMethods[]', '')
+	selected_startDate = request.GET.get('startDate', '')
+	selected_endDate = request.GET.get('endDate', '')
 
 	form = QuotationFilterForm(request.GET)
 
 	obj_list = Quotation.objects.all()
+
+	if selected_startDate:
+		startDate = datetime.datetime.strptime(selected_startDate, '%Y-%m-%d').date()
+		obj_list = obj_list.filter(recieved_date__gte=startDate)
+	if selected_endDate:
+		endDate = datetime.datetime.strptime(selected_endDate, '%Y-%m-%d').date()
+		obj_list = obj_list.filter(recieved_date__lte=endDate)
 
 	if len(selected_freezingMethods) > 0:
 		obj_list = obj_list.filter(Q(freezing_method__in=selected_freezingMethods))

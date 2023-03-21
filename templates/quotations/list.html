@@ -18,6 +18,7 @@
 							<table class="table table-bordered table-striped">
 									<thead class="thead-dark">
 											<tr>
+													<th>#</th>
 													<th>Species</th>
 													<th>Processing Method</th>
 													<th>Harvesting Method</th>
@@ -28,6 +29,7 @@
 													<th>Actions</th>
 											</tr>
 											<tr>
+												<td></td>
 												<td>
 													<select name="specie" id="specie" class='form-control' multiple>
 
@@ -74,13 +76,19 @@
 														{% endfor %}
 													</select>
 												</td>
-												<td></td>
+												<td>
+													{{ form.start_date }}
+													{{ form.end_date }}
+												</td>
 												<td></td>
 										</tr>
 									</thead>
 									<tbody>
 											{% for obj in data %}
 											<tr >
+													<td>
+														{{ forloop.counter|add:data.start_index|add:"-1" }}
+													</td>
 													<td>{{ obj.specie }}</td>
 													<td>{{ obj.processing_method }}</td>
 													<td>{{ obj.harvesting_method }}</td>
@@ -174,13 +182,21 @@
 		$('#harvesting_method').select2();
 		$('#freezing_method').select2();
 
-		$("#origin, #destination, #specie, #processing_method, #harvesting_method, #freezing_method").on("change", function () {
+		var updateTable = function(){
 			var selectedDestinations = $('#destination').val();
 			var selectedOrigins = $('#origin').val();
 			var selectedFreezingMethods = $('#freezing_method').val();
 			var selectedSpecies = $('#specie').val();
 			var selectedProcessingMethods = $('#processing_method').val();
 			var selectedHarvestingMethods = $('#harvesting_method').val();
+			var selectedStartDate = $('#id_start_date').val();
+			var selectedEndDate = $('#id_end_date').val();
+
+			if(new Date(selectedStartDate).getTime() > new Date(selectedEndDate).getTime())
+			{
+				alert('Start date cannot be greater than enddate')
+				return
+			}
 
 			var data = {
 				'freezingMethods': selectedFreezingMethods,
@@ -189,9 +205,10 @@
 				'destinations': selectedDestinations,
 				'processingMethods': selectedProcessingMethods,
 				'harvestingMethods':selectedHarvestingMethods,
-			};
+				'startDate':selectedStartDate,
+				'endDate':selectedEndDate
 
-			console.log(data)
+			};
 
 			$.ajax({
         url: "/quotations/",
@@ -205,6 +222,19 @@
           console.error("AJAX error:", status, error);
         },
       });
+
+		}
+
+		$('#id_start_date').change(function() {
+			updateTable()
+		})
+
+		$('#id_end_date').change(function() {
+			updateTable()
+		})
+
+		$("#origin, #destination, #specie, #processing_method, #harvesting_method, #freezing_method ").on("change", function () {
+			updateTable()
 		});
 	})
 </script>
