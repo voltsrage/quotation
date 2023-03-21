@@ -3,8 +3,8 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse,Http404
 from django.urls import reverse
 from django.forms.models import modelformset_factory
-from .models import Quotation,SizePrice,SizePriceBoxNetWeight,Supplier
-from .forms import QuotationForm,SizePriceForm,SizeFormSet,SupplierForm
+from .models import *
+from .forms import QuotationForm,SizePriceForm,SizeFormSet,SupplierForm,QuotationFilterForm
 from django.contrib import messages
 from django.views.generic import ListView
 from django.core.serializers import serialize
@@ -108,13 +108,43 @@ def updateQuotation(request, id=None):
 	return render(request,'quotations/create.html',context)
 
 def listQuotation(request):
+
+	selected_freezingMethods  = request.GET.getlist('freezingMethods[]')
+	selected_origins  = request.GET.getlist('origins[]')
+	selected_species  = request.GET.getlist('species[]')
+	selected_destinations  = request.GET.getlist('destinations[]')
+	selected_processingMethods   = request.GET.getlist('processingMethods[]')
+	selected_harvestingMethods = request.GET.getlist('harvestingMethods[]', '')
+
+	form = QuotationFilterForm(request.GET)
+
 	obj_list = Quotation.objects.all()
+
+	if len(selected_freezingMethods) > 0:
+		obj_list = obj_list.filter(Q(freezing_method__in=selected_freezingMethods))
+
+	if len(selected_origins) > 0:
+		obj_list = obj_list.filter(Q(origin__in=selected_origins))
+
+	if len(selected_species) > 0:
+		obj_list = obj_list.filter(Q(specie__in=selected_species))
+
+	if len(selected_destinations) > 0:
+		obj_list = obj_list.filter(Q(destination__in=selected_destinations))
+
+	if len(selected_processingMethods) > 0:
+		obj_list = obj_list.filter(Q(processing_method__in=selected_processingMethods))
+
+	if len(selected_harvestingMethods) > 0:
+		obj_list = obj_list.filter(Q(harvesting_method__in=selected_harvestingMethods))
+
 	paginator = Paginator(obj_list,10)
 	page = request.GET.get('page')
 	data = paginator.get_page(page)
 	context = {
 		"obj_list":obj_list,
 		"data":data,
+		'form':form
 	}
 	return render(request,'quotations/list.html',context)
 
@@ -184,6 +214,16 @@ class QuotationInline():
 			obj.delete()
 		for i,sizeprice in enumerate(sizeprices):
 			sizeprice.quotation = self.object
+			if sizeprice.currency_id == 1: #twd
+				sizeprice.price_in_usd = round(sizeprice.price / Decimal(30.67),2)
+			elif sizeprice.currency_id == 2: #usd
+				sizeprice.price_in_usd = round(sizeprice.price / Decimal(1.00),2)
+			elif sizeprice.currency_id == 3: #jpy
+				sizeprice.price_in_usd = round(sizeprice.price / Decimal(132.33),2)
+			elif sizeprice.currency_id == 4: #cny
+				sizeprice.price_in_usd = round(sizeprice.price / Decimal(6.89),2)
+			elif sizeprice.currency_id ==5: #eur
+				sizeprice.price_in_usd = round(sizeprice.price / Decimal(0.94),2)
 			sizeprice.save()
 			if formset[i].cleaned_data["net_weight_box"]:
 				if(formset[i].cleaned_data["id"]):
@@ -324,9 +364,9 @@ def quotation_chart_data(request):
 
 		data = queryset.values('recieved_date__year','recieved_date__month').annotate(
 			avg_price=Avg(Case (
-				When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
-				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
-				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
+				When(sizeprices__price_unit_id=1, then=F("sizeprices__price_in_usd")),
+				When(sizeprices__price_unit_id=2, then=F("sizeprices__price_in_usd")*Decimal(2.2)),
+				When(sizeprices__price_unit_id=3, then=F("sizeprices__price_in_usd")/F("sizeprices__netweight__net_weight")),
 				default=Decimal(0.0))
 			)).order_by('recieved_date__year','recieved_date__month')
 
@@ -351,25 +391,60 @@ def price_chart_data_multiple(request):
 		selected_species  = request.GET.getlist('species[]')
 		selected_incoterms  = request.GET.getlist('incoterms[]')
 		selected_years   = request.GET.getlist('years[]')
+		selected_period = request.GET.get('period', '')
+		selected_unit = request.GET.get('unit', '')
+		selected_currency = request.GET.get('currency', '')
+
+		price_conversion = 1
+		print(selected_currency)
+		if selected_currency == '1': #twd
+			price_conversion = Decimal(30.67)
+		elif selected_currency == '2': #usd
+			price_conversion = Decimal(1.00)
+		elif selected_currency == '3': #jpy
+			price_conversion = Decimal(132.33)
+		elif selected_currency == '4': #cny
+			price_conversion = Decimal(6.89)
+		elif selected_currency =='5': #eur
+			price_conversion = Decimal(0.94)
+
+		# price_conversion = Case(
+		# 	When(sizeprices__currency_id=1, then=Value(Decimal(30.67))),
+		# 	When(sizeprices__currency_id=2, then=Value(Decimal(1.00))),
+		# 	When(sizeprices__currency_id=3, then=Value(Decimal(132.33))),
+		# 	When(sizeprices__currency_id=4, then=Value(Decimal(6.89))),
+		# 	When(sizeprices__currency_id=5, then=Value(Decimal(0.98)))
+		# )
+
+		if selected_unit == 'kg':
+			avg_price = Avg(Case (
+									When(sizeprices__price_unit_id=1, then=F("sizeprices__price_in_usd")),
+									When(sizeprices__price_unit_id=2, then=F("sizeprices__price_in_usd")*Decimal(2.2)),
+									When(sizeprices__price_unit_id=3, then=F("sizeprices__price_in_usd")/F("sizeprices__netweight__net_weight")),
+									default=Decimal(0.0))
+								)
+		elif selected_unit == 'lb':
+			avg_price = Avg(Case (
+									When(sizeprices__price_unit_id=1, then=F("sizeprices__price_in_usd")/Decimal(2.2)),
+									When(sizeprices__price_unit_id=2, then=F("sizeprices__price_in_usd")),
+									When(sizeprices__price_unit_id=3, then=(F("sizeprices__price_in_usd")/F("sizeprices__netweight__net_weight"))/Decimal(2.2)),
+									default=Decimal(0.0))
+								)
 
 		years_filter = Quotation.objects.filter(
 			recieved_date__year__in=selected_years
 			)
 
 		if len(selected_suppliers) > 0:
-			print('has suppliers')
 			years_filter = years_filter.filter(Q(supplier__in=selected_suppliers))
 
 		if len(selected_origins) > 0:
-			print('has origins')
 			years_filter = years_filter.filter(Q(origin__in=selected_origins))
 
 		if len(selected_species) > 0:
-			print('has species')
 			years_filter = years_filter.filter(Q(specie__in=selected_species))
 
 		if len(selected_incoterms) > 0:
-			print('has incoterms')
 			years_filter = years_filter.filter(Q(incoterm__in=selected_incoterms))
 
 		prices = years_filter
@@ -403,66 +478,40 @@ def price_chart_data_multiple(request):
 		for i,year in enumerate(selected_years):
 			prices_year = prices.filter(recieved_date__year=year)
 			data = []
-			data_wk = []
-			data_qt = []
-			for month in range(1, 13):
-					prices_month = prices_year.filter(recieved_date__month=month)
-					if prices_month.exists():
-						average_price = prices_month.aggregate(
-							avg_price=Avg(Case (
-								When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
-								When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
-								When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
-								default=Decimal(0.0))
-							))['avg_price']
 
-						data.append(round(average_price, 2))
-					else:
-							data.append(0)
+			if selected_period == 'mtn':
+				for month in range(1, 13):
+						prices_month = prices_year.filter(recieved_date__month=month)
+						if prices_month.exists():
+							average_price = prices_month.aggregate(
+								avg_price=avg_price * price_conversion)['avg_price']
 
-			for week in range(1, 53):
-					prices_week = prices_year.filter(recieved_date__week=week)
-					if prices_week.exists():
-						average_price = prices_week.aggregate(
-							avg_price=Avg(Case (
-								When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
-								When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
-								When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
-								default=Decimal(0.0))
-							))['avg_price']
+							data.append(round(average_price, 2))
+						else:
+								data.append(0)
 
-						data_wk.append(round(average_price, 2))
-					else:
-							data_wk.append(0)
+			elif selected_period == 'wk':
+				for week in range(1, 53):
+						prices_week = prices_year.filter(recieved_date__week=week)
+						if prices_week.exists():
+							average_price = prices_week.aggregate(
+								avg_price=avg_price* price_conversion)['avg_price']
 
-			for quarter in range(1, 5):
-					prices_quarter = prices_year.filter(recieved_date__quarter=quarter)
-					if prices_quarter.exists():
-						average_price = prices_quarter.aggregate(
-							avg_price=Avg(Case (
-								When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
-								When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
-								When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
-								default=Decimal(0.0))
-							))['avg_price']
+							data.append(round(average_price, 2))
+						else:
+								data.append(0)
 
-						data_qt.append(round(average_price, 2))
-					else:
-							data_qt.append(0)
-			print()
-			print('-------------------------------------------------------------')
-			print(data)
-			print()
-			print('-------------------------------------------------------------')
-			print()
-			print(data_wk)
-			print()
-			print('-------------------------------------------------------------')
-			print()
-			print(data_qt)
-			print()
-			print('-------------------------------------------------------------')
-			print()
+			elif selected_period == 'qtr':
+				for quarter in range(1, 5):
+						prices_quarter = prices_year.filter(recieved_date__quarter=quarter)
+						if prices_quarter.exists():
+							average_price = prices_quarter.aggregate(
+								avg_price=avg_price* price_conversion)['avg_price']
+
+							data.append(round(average_price, 2))
+						else:
+								data.append(0)
+
 			dataset = {
 						'label': str(year),
 						'data': data,
@@ -471,7 +520,16 @@ def price_chart_data_multiple(request):
 				}
 			datasets.append(dataset)
 
-		labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+		labels = []
+		if selected_period == 'mtn':
+			labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+		elif selected_period == 'wk':
+			labels = []
+			for week in range(1, 53):
+				labels.append(f'Wk{week}')
+		elif selected_period == 'qtr':
+			labels = ['Qtr1', 'Qtr2', 'Qtr3', 'Qtr4']
+
 		data = {
 				'labels': labels,
 				'datasets': datasets

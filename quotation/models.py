@@ -297,6 +297,7 @@ class SizePrice(models.Model):
 
 	size = models.CharField(max_length=20)
 	price = models.DecimalField(decimal_places=2,max_digits=10)
+	price_in_usd = models.DecimalField(decimal_places=2,max_digits=10, blank=True, null=True)
 	price_unit = models.ForeignKey(PriceUnit, on_delete=models.SET_NULL, blank=True, null=True)
 	currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, blank=True, null=True)
 	quotation = models.ForeignKey(Quotation, on_delete=models.CASCADE,related_name='sizeprices')

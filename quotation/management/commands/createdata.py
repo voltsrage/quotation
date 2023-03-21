@@ -356,18 +356,31 @@ class Command(BaseCommand):
 
 		### SizePrice Start ###
 
-		# for _ in range(5000):
-		# 	quotation_id = random.randint(1,1000)
-		# 	create_by_id = 1
-		# 	currency_id = random.randint(1,5)
-		# 	price_unit_id = random.randint(1,4)
-		# 	size = fake.quotation_size()
-		# 	price = (round(random.uniform(0.99,19.99),2))
-		# 	SizePrice.objects.get_or_create(quotation_id=quotation_id,
-		# 		   create_by_id=create_by_id,
-		# 			 currency_id=currency_id,
-		# 			 price_unit_id=price_unit_id,
-		# 			 size=size,price=price)
+		for _ in range(5000):
+			quotation_id = random.randint(1,1000)
+			create_by_id = 1
+			currency_id = random.randint(1,5)
+			price_unit_id = random.randint(1,4)
+			size = fake.quotation_size()
+			price = (round(random.uniform(0.99,19.99),2))
+			price_in_usd = round(price / Decimal(1),2)
+			if currency_id == 1: #twd
+				price_in_usd =  round(price / Decimal(30.67),2)
+			elif currency_id == 2: #usd
+				price_in_usd =  round(price / Decimal(1),2)
+			elif currency_id == 3: #jpy
+				price_in_usd =  round(price / Decimal(132.33),2)
+			elif currency_id == 4: #cny
+				price_in_usd =  round(price / Decimal(6.89),2)
+			elif currency_id ==5: #eur
+				price_in_usd =  round(price / Decimal(0.94),2)
+			SizePrice.objects.get_or_create(quotation_id=quotation_id,
+						create_by_id=create_by_id,
+						currency_id=currency_id,
+						price_unit_id=price_unit_id,
+						price_in_usd = price_in_usd,
+						size=size,
+						price=price)
 
 		### SizePrice End ###
 

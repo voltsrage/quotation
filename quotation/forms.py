@@ -1,5 +1,5 @@
 from django import forms
-from .models import Quotation, SizePrice,Supplier
+from .models import *
 from django.forms import inlineformset_factory
 
 class QuotationForm(forms.ModelForm):
@@ -69,3 +69,12 @@ SizeFormSet = inlineformset_factory(
 	Quotation, SizePrice, form=SizePriceForm,
 	extra=1, can_delete=True, can_delete_extra=True, can_order=True
 )
+
+class QuotationFilterForm(forms.Form):
+	processing_method = forms.ModelChoiceField(queryset=ProcessingMethod.objects.all(), required=False)
+	harvesting_method = forms.ModelChoiceField(queryset=HarvestingMethod.objects.all(), required=False)
+	freezing_method = forms.ModelChoiceField(queryset=FreezingMethod.objects.all(), required=False)
+	specie = forms.ModelChoiceField(queryset=Specie.objects.all(), required=False)
+	origin = forms.ModelChoiceField(queryset=Country.objects.all(), required=False)
+	destination = forms.ModelChoiceField(queryset=Port.objects.all(), required=False)
+	years =forms.ModelChoiceField(queryset= Quotation.objects.order_by('recieved_date__year').values_list('recieved_date__year', flat=True).distinct(), required=False)

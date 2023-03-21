@@ -13,7 +13,7 @@ def dashboard(request):
 	incoterms = Incoterm.objects.all()
 	shipped_froms = Country.objects.all()
 	years = Quotation.objects.order_by('recieved_date__year').values_list('recieved_date__year', flat=True).distinct()
-
+	currencies = Currency.objects.all()
 
 
 	min_date =  Quotation.objects.aggregate(min_dt=Min('recieved_date'))
@@ -34,7 +34,8 @@ def dashboard(request):
 		'incoterms':incoterms,
 		'shipped_froms':shipped_froms,
 		'years':years,
-		'date_range':date_range
+		'date_range':date_range,
+		'currencies':currencies
 	}
 
 	return render(request, 'dashboard.html', context)

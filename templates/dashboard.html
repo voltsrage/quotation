@@ -83,20 +83,45 @@
 
 	<form id="filter-form" class="row g-3">
 
-		<div class="col-md-12">
+		<div class="col-md-6">
 			<label for="yearM" class="form-label">Years:</label>
 			<select name="yearM" id="yearM" class='form-control'  multiple="multiple">
-				<option value="">All</option>
 				{% for year in years %}
 					<option value="{{ year }}">{{ year }}</option>
 				{% endfor %}
 			</select>
 		</div>
 
+		<div class="col-md-6 row">
+			<div class="col-md-4 pt-3">
+				<label for="rangechoiceM" class="form-label">Period:</label>
+				<select name="rangechoiceM" id="rangechoiceM" class='form-control'>
+					<option value="wk">Week</option>
+					<option value="mtn" selected>Month</option>
+					<option value="qtr">Quarter</option>
+				</select>
+			</div>
+			<div class="col-md-4 pt-3">
+				<label for="priceUnitM" class="form-label">Unit:</label>
+				<select name="priceUnitM" id="priceUnitM" class='form-control'>
+					<option value="kg" selected>kilo</option>
+					<option value="lb" >pound</option>
+				</select>
+			</div>
+			<div class="col-md-4 pt-3">
+				<label for="currencyM" class="form-label">Currencies:</label>
+				<select name="currencyM" id="currencyM" class='form-control'>
+					{% for currency in currencies %}
+						<option value="{{ currency.id }}">{{ currency.name }}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+
 		<div class="col-md-6">
+
 			<label for="supplierM" class="form-label">Supplier:</label>
 			<select name="supplierM" id="supplierM" class='form-control'  multiple="multiple">
-				<option value="">All</option>
 				{% for supplier in suppliers %}
 					<option value="{{ supplier.id }}">{{ supplier.name }}</option>
 				{% endfor %}
@@ -106,7 +131,6 @@
 		<div class="col-md-6">
 			<label for="originM" class="form-label">Origin:</label>
 			<select name="originM" id="originM" class='form-control'  multiple="multiple">
-				<option value="">All</option>
 				{% for origin in origins %}
 					<option value="{{ origin.id  }}">{{ origin.name }}</option>
 				{% endfor %}
@@ -136,7 +160,6 @@
 		<div class="col-md-6">
 			<label for="specieM" class="form-label">Specie:</label>
 			<select name="specieM" id="specieM" class='form-control' multiple="multiple">
-				<option value="">All</option>
 				{% for specie in species %}
 					<option value="{{ specie.id  }}">{{ specie.name }}</option>
 				{% endfor %}
@@ -146,7 +169,6 @@
 		<div class="col-md-6">
 			<label for="incotermM" class="form-label">Incoterm:</label>
 			<select name="incotermM" id="incotermM" class='form-control' multiple="multiple">
-				<option value="">All</option>
 				{% for incoterm in incoterms %}
 					<option value="{{ incoterm.id  }}">{{ incoterm.name }}</option>
 				{% endfor %}
@@ -161,8 +183,6 @@
 </div>
 
 <canvas id="chart2" height='100px'></canvas>
-
-<h2>Section title</h2>
 
 <script
   src="https://code.jquery.com/jquery-3.6.4.min.js"
@@ -185,6 +205,12 @@
 		$('#supplierM').select2();
 		$('#specieM').select2();
 		$('#incotermM').select2();
+		$('#rangechoiceM').select2();
+		$('#priceUnitM').select2();
+		$('#currencyM option[value=1]').attr('selected','selected');
+		$('#currencyM').select2();
+
+
 
 		var dateRange = $('#date-slider');
 
@@ -322,12 +348,20 @@
 			var selectedYears = $('#yearM').val();
 			var selectedSpecies = $('#specieM').val();
 			var selectedIncoterms = $('#incotermM').val();
+
+			var selectedPeriod = $('#rangechoiceM').val();
+			var selectedUnit = $('#priceUnitM').val();
+			var selectedCurrency = $('#currencyM').val();
+
 			var data = {
 				'suppliers': selectedSuppliers,
 				'origins': selectedOrigins,
 				'species': selectedSpecies,
 				'incoterms': selectedIncoterms,
-				'years': selectedYears
+				'years': selectedYears,
+				'period':selectedPeriod,
+				'unit':selectedUnit,
+				'currency':selectedCurrency
 			};
 
 			// Send the AJAX request to get the data for the chart
