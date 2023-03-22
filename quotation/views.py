@@ -147,13 +147,20 @@ def listQuotation(request):
 	if len(selected_harvestingMethods) > 0:
 		obj_list = obj_list.filter(Q(harvesting_method__in=selected_harvestingMethods))
 
-	paginator = Paginator(obj_list,10)
+
+	pageSize = request.GET.get('pageSize')
+
+	if pageSize is None:
+		pageSize = 10
+
+	paginator = Paginator(obj_list,pageSize)
 	page = request.GET.get('page')
 	data = paginator.get_page(page)
+
 	context = {
 		"obj_list":obj_list,
 		"data":data,
-		'form':form
+		'form':form,
 	}
 	return render(request,'quotations/list.html',context)
 

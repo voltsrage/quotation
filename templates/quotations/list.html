@@ -107,15 +107,28 @@
 							</table>
 
 							<!-- Pagination -->
-							{{data}}
+							{% if data.has_other_pages %}
+									<div class='text-center'>
+										<select name="pageSize" id="pageSize" class='p-1 mb-2' onchange='updateTablePagesize({{data.number}})'>
+											<option value="10" selected>10</option>
+											<option value="25">25</option>
+											<option value="50">50</option>
+											<option value="100">100</option>
+										</select>
+									</div>
+							{%endif%}
 							<nav>
 								{% if data.has_other_pages %}
-									<ul class="pagination">
+
+								<div class='text-center'>
+									<h6>Page {{data.number}} of {{data.paginator.num_pages}}</h6>
+								</div>
+									<ul class="pagination justify-content-center">
 
 											{% if data.has_previous %}
-												<a href="?page=1" class='btn btn-outline-secondary mb-4' style='border-radius: 1px solid #d3d3d3;'>First</a>
+												<a href="#" onclick="updateTablePaging(1)" class='btn btn-outline-secondary mb-4' style='border-radius: 1px solid #d3d3d3;'>First</a>
 												<li class='page-item'>
-														<a href="?page={{data.previous_page_number}}" class='page-link'><i class="fas fa-angle-double-left"></i></a>
+														<a href="#"  onclick="updateTablePaging({{data.previous_page_number}})"  class='page-link'><i class="fas fa-angle-double-left"></i></a>
 												</li>
 											{%else%}
 												<li class="page-item disable"></li>
@@ -123,39 +136,39 @@
 
 											{% if data.number|add:'-3' > 1 %}
 												<li>
-													<a href="?page={{data.number|add:'-3'}}" class="page-link">&hellip;</a>
+													<a href="#" onclick="updateTablePaging({{data.number|add:'-3'}})" class="page-link">&hellip;</a>
 												</li>
 											{%endif%}
 
 											{%for i in data.paginator.page_range %}
 												{% if data.number == i %}
 													<li class="page-item active">
-															<span class="page-link">{{i}} <span class="sr-only"></span></span>
+															<span class="page-link">{{i}}<span class="sr-only"></span></span>
 													</li>
 												{% elif i > data.number|add:'-3' and i < data.number|add:'3' %}
 													<li class="page-item">
-														<a href="?page={{i}}" class="page-link">{{i}}</a>
+														<a href="#" onclick="updateTablePaging({{i}})" class="page-link">{{i}}</a>
 													</li>
 												{%endif%}
 											{%endfor%}
 
 											{% if data.paginator.num_pages > data.number|add:'2' %}
 													<li>
-															<a href="?page={{data.number|add:'2'}}" class="page-link">&hellip;</a>
+															<a href="#" onclick="updateTablePaging({{data.number|add:'2'}})" class="page-link">&hellip;</a>
 													</li>
 													<li>
-															<a href="?page={{i}}"></a>
+															<a href="#" onclick="updateTablePaging({{i}})"></a>
 													</li>
 													<li>
-															<a href="?pages={{data.paginator.num_pages}}" class="page-link">{{data.paginator.num_pages}}</a>
+															<a href="#" onclick="updateTablePaging({{data.paginator.num_pages}})" class="page-link">{{data.paginator.num_pages}}</a>
 													</li>
 											{% endif %}
 
 											{% if data.has_next %}
 													<li class='page-item'>
-															<a href="?page={{data.next_page_number}}" class='page-link'><i class="fas fa-angle-double-right"></i></a>
+															<a href="#" onclick="updateTablePaging({{data.next_page_number}})" class='page-link'><i class="fas fa-angle-double-right"></i></a>
 													</li>
-													<a href="?page={{data.paginator.num_pages}}" class='btn btn-outline-secondary mb-4' style='border-radius: 1px solid #d3d3d3;'>Last</a> {%else%}
+													<a href="#" onclick="updateTablePaging({{data.paginator.num_pages}})" class='btn btn-outline-secondary mb-4' style='border-radius: 1px solid #d3d3d3;'>Last</a> {%else%}
 													<li class="page-item disable"></li>
 											{% endif%}
 									</ul>
@@ -173,6 +186,62 @@
   crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+	function updateTablePagesize(page){
+
+		console.log($.trim($('.page-item.active').text()))
+	}
+	function updateTablePaging(page){
+
+
+		var selectedPage = page
+		var selectedDestinations = $('#destination').val();
+		var selectedOrigins = $('#origin').val();
+		var selectedFreezingMethods = $('#freezing_method').val();
+		var selectedSpecies = $('#specie').val();
+		var selectedProcessingMethods = $('#processing_method').val();
+		var selectedHarvestingMethods = $('#harvesting_method').val();
+		var selectedStartDate = $('#id_start_date').val();
+		var selectedEndDate = $('#id_end_date').val();
+		var selectPageSize = $('#pageSize').val();
+
+		if(new Date(selectedStartDate).getTime() > new Date(selectedEndDate).getTime())
+			{
+				alert('Start date cannot be greater than enddate')
+				return
+			}
+
+			var data = {
+				'freezingMethods': selectedFreezingMethods,
+				'origins': selectedOrigins,
+				'species': selectedSpecies,
+				'destinations': selectedDestinations,
+				'processingMethods': selectedProcessingMethods,
+				'harvestingMethods':selectedHarvestingMethods,
+				'startDate':selectedStartDate,
+				'endDate':selectedEndDate,
+				'page':selectedPage,
+				'pageSize':selectPageSize
+
+			};
+
+
+
+			$.ajax({
+        url: "/quotations/",
+        data: data,
+        success: function (data) {
+          // Replace the table with the updated one
+         	$("table tbody").replaceWith($(data).find("table tbody"));
+					$('.table-responsive nav').replaceWith($(data).find(".table-responsive nav"));
+					console.log({{data.custom_pagesize}})
+        },
+        error: function (xhr, status, error) {
+          console.error("AJAX error:", status, error);
+        },
+      });
+	}
+
+
 	$(document).ready(function() {
 
 		$('#origin').select2();
@@ -182,7 +251,9 @@
 		$('#harvesting_method').select2();
 		$('#freezing_method').select2();
 
-		var updateTable = function(){
+
+
+		var updateTable = function(page){
 			var selectedDestinations = $('#destination').val();
 			var selectedOrigins = $('#origin').val();
 			var selectedFreezingMethods = $('#freezing_method').val();
@@ -191,6 +262,8 @@
 			var selectedHarvestingMethods = $('#harvesting_method').val();
 			var selectedStartDate = $('#id_start_date').val();
 			var selectedEndDate = $('#id_end_date').val();
+			var selectedPage = page
+			var selectPageSize = $('#pageSize').val();
 
 			if(new Date(selectedStartDate).getTime() > new Date(selectedEndDate).getTime())
 			{
@@ -206,9 +279,12 @@
 				'processingMethods': selectedProcessingMethods,
 				'harvestingMethods':selectedHarvestingMethods,
 				'startDate':selectedStartDate,
-				'endDate':selectedEndDate
-
+				'endDate':selectedEndDate,
+				'page':selectedPage,
+				'pageSize':selectPageSize
 			};
+
+
 
 			$.ajax({
         url: "/quotations/",
@@ -217,6 +293,7 @@
           // Replace the table with the updated one
          	$("table tbody").replaceWith($(data).find("table tbody"));
 					$('.table-responsive nav').replaceWith($(data).find(".table-responsive nav"));
+					$('#pageSize').val({{pageSize}}).change();
         },
         error: function (xhr, status, error) {
           console.error("AJAX error:", status, error);
@@ -226,15 +303,19 @@
 		}
 
 		$('#id_start_date').change(function() {
-			updateTable()
+			updateTable(1)
 		})
 
 		$('#id_end_date').change(function() {
-			updateTable()
+			updateTable(1)
 		})
 
-		$("#origin, #destination, #specie, #processing_method, #harvesting_method, #freezing_method ").on("change", function () {
-			updateTable()
+		$('#pageSize').change(function() {
+			updateTable($.trim($('.page-item.active').text()))
+		})
+
+		$("#origin, #destination,  #specie, #processing_method, #harvesting_method, #freezing_method ").on("change", function () {
+			updateTable(1)
 		});
 	})
 </script>
