@@ -26,4 +26,5 @@ urlpatterns = [
 		path('',views.dashboard, name='dashboard'),
 		path('api/user/',include('user.urls')),
 		path('quotations/',include('quotation.urls')),
+    path('importcharts/',include('importcharts.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

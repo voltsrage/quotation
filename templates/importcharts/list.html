@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+	<div class="card card-body">
+			<h5>Quotations</h5>
+	</div>
+	<div class="card card-body">
+			<div class="d-flex bd-highlight mb-3">
+					<div class="me-auto p-2 bd-highlight">
+					</div>
+					<div class="p-2 bd-highlight">
+							<button type="button" data-bs-toggle="modal" data-bs-target="#excelFormModal" class="btn btn-success">Upload</button>
+					</div>
+
+					<div class="modal fade" id="excelFormModal" tabindex="-1" role="dialog" aria-labelledby="excelFormModal" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+								<div class="modal-content">
+										<div class="modal-header">
+												<h5 class="modal-title">Upload Imports</h5>
+
+										</div>
+										<form class="container-fluid my-4" method="post" id="uploadExcel_form">
+												<div class='modal-body'>
+
+														{% csrf_token %}
+														<div class="form-group">
+															<label for="file" class="form-label">Select file:</label>
+															<input id='importFile' type="file" name="file" class='form-control' accept=".csv,.xlsx"><br>
+														</div>
+
+												</div>
+												<div class="modal-footer">
+														<button type="submit" id='uploadExcelId' class="btn btn-primary">Save</button>
+														<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+												</div>
+										</form>
+								</div>
+						</div>
+					</div>
+			</div>
+
+				<div class="table-responsive">
+
+						<table class="table table-bordered table-striped">
+								<thead class="thead-dark">
+										<tr>
+												<th>#</th>
+												<th>Species</th>
+												<th>Processing Method</th>
+												<th>Harvesting Method</th>
+												<th>Freezing Method</th>
+												<th>Origin</th>
+												<th>Destination</th>
+												<th>Rec'd Date</th>
+												<th>Actions</th>
+										</tr>
+
+								</thead>
+								<tbody>
+
+								</tbody>
+						</table>
+
+
+				</div>
+
+	</div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+		$(document).ready(function() {
+				// when user clicks add more btn of sizeprices
+
+				$('.priceunit').each(function() {
+						var idNum = $(this)[0].id[$(this)[0].id.indexOf('-') + 1]
+						if ($(this).val() == 3) {
+								$('#netweight-' + idNum.toString()).removeClass('net-weight-display')
+						}
+				})
+
+				$('#uploadExcel_form').submit('click', function(e) {
+					e.preventDefault();
+						var formData = new FormData(this);
+
+						$.ajax({
+							type: 'POST',
+							data: formData,
+							processData: false,
+							contentType: false,
+							url: "{% url 'importchart:import_file' %}",
+								// on success
+								success: function(response) {
+
+								},
+								// on error
+								error: function(response) {
+										// alert the error if any error occured
+										console.log(response.responseJSON.errors)
+								}
+						});
+
+						return false;
+				});
+
+
+
+
+
+		});
+</script>
+
+{% endblock %}

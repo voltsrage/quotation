@@ -1,6 +1,6 @@
-FROM python:3.8-alpine
+FROM python:3.10-slim-buster
 ENV PYTHONUNBUFFERED=1
-RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
+RUN apt-get update && apt-get install -y postgresql-server-dev-all gcc python3-dev musl-dev
 WORKDIR /app
 
 COPY requirements.txt requirements.txt
