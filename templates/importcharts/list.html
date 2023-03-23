@@ -47,23 +47,103 @@
 								<thead class="thead-dark">
 										<tr>
 												<th>#</th>
-												<th>Species</th>
-												<th>Processing Method</th>
-												<th>Harvesting Method</th>
-												<th>Freezing Method</th>
-												<th>Origin</th>
-												<th>Destination</th>
-												<th>Rec'd Date</th>
-												<th>Actions</th>
+												<th>Commodity Code</th>
+												<th>Month</th>
+												<th>Description</th>
+												<th>Country</th>
+												<th>Price/kg (USD)</th>
+												<th>Weight (kg)</th>
+												<th>Total Cost</th>
 										</tr>
 
 								</thead>
 								<tbody>
-
+									{% for obj in data %}
+											<tr >
+													<td>
+														{{ forloop.counter|add:data.start_index|add:"-1" }}
+													</td>
+													<td>{{ obj.commodity_code }}</td>
+													<td>{{ obj.month|date:"Y-m" }}</td>
+													<td>{{ obj.production_description }}</td>
+													<td>{{ obj.country }}</td>
+													<td>{{ obj.price_per_kg }}</td>
+													<td>{{ obj.total_weight_kg }}</td>
+													<td>{{ obj.total_price }}</td>
+											</tr>
+											{% endfor %}
 								</tbody>
 						</table>
 
+						<!-- Pagination -->
+						{% if data.has_other_pages %}
+						<div class='text-center'>
+							<select name="pageSize" id="pageSize" class='p-1 mb-2' onchange='updateTablePagesize({{data.number}})'>
+								<option value="10" selected>10</option>
+								<option value="25">25</option>
+								<option value="50">50</option>
+								<option value="100">100</option>
+							</select>
+						</div>
+				{%endif%}
+				<nav>
+					{% if data.has_other_pages %}
 
+					<div class='text-center'>
+						<h6>Page {{data.number}} of {{data.paginator.num_pages}}</h6>
+					</div>
+						<ul class="pagination justify-content-center">
+
+								{% if data.has_previous %}
+									<a href="#" onclick="updateTablePaging(1)" class='btn btn-outline-secondary mb-4' style='border-radius: 1px solid #d3d3d3;'>First</a>
+									<li class='page-item'>
+											<a href="#"  onclick="updateTablePaging({{data.previous_page_number}})"  class='page-link'><i class="fas fa-angle-double-left"></i></a>
+									</li>
+								{%else%}
+									<li class="page-item disable"></li>
+								{% endif%}
+
+								{% if data.number|add:'-3' > 1 %}
+									<li>
+										<a href="#" onclick="updateTablePaging({{data.number|add:'-3'}})" class="page-link">&hellip;</a>
+									</li>
+								{%endif%}
+
+								{%for i in data.paginator.page_range %}
+									{% if data.number == i %}
+										<li class="page-item active">
+												<span class="page-link">{{i}}<span class="sr-only"></span></span>
+										</li>
+									{% elif i > data.number|add:'-3' and i < data.number|add:'3' %}
+										<li class="page-item">
+											<a href="#" onclick="updateTablePaging({{i}})" class="page-link">{{i}}</a>
+										</li>
+									{%endif%}
+								{%endfor%}
+
+								{% if data.paginator.num_pages > data.number|add:'2' %}
+										<li>
+												<a href="#" onclick="updateTablePaging({{data.number|add:'2'}})" class="page-link">&hellip;</a>
+										</li>
+										<li>
+												<a href="#" onclick="updateTablePaging({{i}})"></a>
+										</li>
+										<li>
+												<a href="#" onclick="updateTablePaging({{data.paginator.num_pages}})" class="page-link">{{data.paginator.num_pages}}</a>
+										</li>
+								{% endif %}
+
+								{% if data.has_next %}
+										<li class='page-item'>
+												<a href="#" onclick="updateTablePaging({{data.next_page_number}})" class='page-link'><i class="fas fa-angle-double-right"></i></a>
+										</li>
+										<a href="#" onclick="updateTablePaging({{data.paginator.num_pages}})" class='btn btn-outline-secondary mb-4' style='border-radius: 1px solid #d3d3d3;'>Last</a> {%else%}
+										<li class="page-item disable"></li>
+								{% endif%}
+						</ul>
+
+						{% endif%}
+				</nav>
 				</div>
 
 	</div>
@@ -72,8 +152,64 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
+	function updateTablePaging(page){
+
+
+		var selectedPage = page
+		var selectPageSize = $('#pageSize').val();
+
+			var data = {
+				'page':selectedPage,
+				'pageSize':selectPageSize
+
+			};
+
+			$.ajax({
+        url: "/importcharts/",
+        data: data,
+        success: function (data) {
+          // Replace the table with the updated one
+         	$("table tbody").replaceWith($(data).find("table tbody"));
+					$('.table-responsive nav').replaceWith($(data).find(".table-responsive nav"));
+
+        },
+        error: function (xhr, status, error) {
+          console.error("AJAX error:", status, error);
+        },
+      });
+	}
 		$(document).ready(function() {
 				// when user clicks add more btn of sizeprices
+
+				var updateTable = function(page){
+					var selectedPage = page
+					var selectPageSize = $('#pageSize').val();
+
+					var data = {
+						'page':selectedPage,
+						'pageSize':selectPageSize
+					};
+
+
+
+					$.ajax({
+						url: "/importcharts/",
+						data: data,
+						success: function (data) {
+							// Replace the table with the updated one
+							 $("table tbody").replaceWith($(data).find("table tbody"));
+							$('.table-responsive nav').replaceWith($(data).find(".table-responsive nav"));
+						},
+						error: function (xhr, status, error) {
+							console.error("AJAX error:", status, error);
+						},
+					});
+
+				}
+
+				$('#pageSize').change(function() {
+					updateTable($.trim($('.page-item.active').text()))
+				})
 
 				$('.priceunit').each(function() {
 						var idNum = $(this)[0].id[$(this)[0].id.indexOf('-') + 1]
