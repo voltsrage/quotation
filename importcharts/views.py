@@ -5,12 +5,19 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from django.core.paginator import Paginator
 from .models import Import
+from django.db.models import Avg,Max,Min,Sum,Count, Q,F,Case, Value, When,ExpressionWrapper, DecimalField
+from django.db import IntegrityError
 from quotation.models import Country
 
 # Create your views here.
 def ImportChartListViewSet(request):
 	imports = Import.objects.all()
-
+	total_weight_tons_per_animal_ytd = imports.filter(month__year=datetime.date.today().year).values('animal__name').annotate(total_weight=Sum('total_weight_tons')).order_by('animal__name')
+	total_weight_tons_per_animal_ytd_last_year = imports.filter(Q(month__year=datetime.date.today().year-1) &  Q(month__month__lte=datetime.date.today().month)).values('animal__name').annotate(total_weight=Sum('total_weight_tons')).order_by('animal__name')
+	total_weight_tons_per_animal_month = imports.filter(Q(month__year=datetime.date.today().year) & Q(month__month=datetime.date.today().month-1)).values_list('animal__name').annotate(total_weight=Sum('total_weight_tons'))
+	total_weight_tons_per_animal_month_last_year = imports.filter(Q(month__year=datetime.date.today().year-1) & Q(month__month=datetime.date.today().month-1)).values_list('animal__name').annotate(total_weight=Sum('total_weight_tons'))
+	print(list(total_weight_tons_per_animal_ytd))
+	print(list(total_weight_tons_per_animal_ytd_last_year))
 	pageSize = request.GET.get('pageSize')
 
 	if pageSize is None:
@@ -20,7 +27,11 @@ def ImportChartListViewSet(request):
 	page = request.GET.get('page')
 	data = paginator.get_page(page)
 	context = {
-				"data":data
+				"data":data,
+				'total_weight_tons_per_animal_ytd':list(total_weight_tons_per_animal_ytd),
+				'total_weight_tons_per_animal_ytd_last_year':list(total_weight_tons_per_animal_ytd_last_year),
+				'total_weight_tons_per_animal_month':total_weight_tons_per_animal_month,
+				'total_weight_tons_per_animal_month_last_year':total_weight_tons_per_animal_month_last_year
 			}
 	return render(request,'importcharts/list.html',context)
 
@@ -54,6 +65,10 @@ def import_file(request):
 					import_item.animal_id = 3
 				elif 'Scallops' in item[3] or 'scallops' in item[3]:
 					import_item.animal_id = 4
+				elif 'halibut' in item[3] or 'Halibut' in item[3]:
+					import_item.animal_id = 5
+				elif 'Crab' in item[3] or 'crab' in item[3]:
+					import_item.animal_id = 6
 
 				if "Viet Nam" in item[4]:
 					item[4] = 'Vietnam'
@@ -82,6 +97,9 @@ def import_file(request):
 				if "Moldova, Republic of" in item[4]:
 					item[4] = 'Moldova'
 
+				if 'Türkiye' in item[4]:
+					item[4] = 'Turkey'
+
 				import_item.country_name = item[4]
 
 				country = Country.objects.get(name=item[4])
@@ -105,14 +123,20 @@ def import_file(request):
 
 				import_item.month = month_for_db
 
-				import_item.save()
-				data = Import.objects.all()
-				paginator = Paginator(data,10)
-				page = request.GET.get('page')
-				data = paginator.get_page(page)
-				context = {
-					"data":data
-				}
+				try:
+					import_item.save()
+				except IntegrityError as e:
+					if 'unique constraint' in str(e.args):
+						continue
+
+			data = Import.objects.all().order_by('-month')
+			paginator = Paginator(data,10)
+			page = request.GET.get('page')
+			data = paginator.get_page(page)
+			context = {
+				"data":data
+			}
 			return render(request, 'importcharts/list.html',context)
 
 	return render(request, 'importcharts/list.html')
+

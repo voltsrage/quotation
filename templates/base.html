@@ -6,114 +6,315 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="author" content="Trendon Cato">
     <meta name="generator" content="Hugo 0.108.0">
-    <title>Dashboard Template · Bootstrap v5.3</title>
-    <script src="https://unpkg.com/htmx.org@1.8.5"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-
-		<script src="{% static 'dashboard/assets/dist/js/bootstrap.bundle.min.js'%}"></script>
+    <title>Dana Quotations</title>
+		<link rel="preconnect" href="https://fonts.gstatic.com">
     {% include 'base/css.html' %}
+    {% include 'base/js.html' %}
+    <script src="https://unpkg.com/htmx.org@1.8.5"></script>
+		<script src="{% static 'dashboard/app.js' %}"></script>
+
+
+
 </head>
 
 <body>
+	<div class="wrapper">
+			<nav id="sidebar" class="sidebar js-sidebar">
+					<div class="sidebar-content js-simplebar">
+							<a class="sidebar-brand" href="index.html">
+									<span class="align-middle">AdminKit</span>
+							</a>
 
-    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#">Company name</a>
-        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-	<span class="navbar-toggler-icon"></span>
-</button>
-        <input class="form-control form-control-dark w-100 rounded-0 border-0" type="text" placeholder="Search" aria-label="Search">
-        <div class="navbar-nav">
-            <div class="nav-item text-nowrap">
-                <a class="nav-link px-3" href="#">Sign out</a>
-            </div>
-        </div>
-    </header>
+							<ul class="sidebar-nav">
+									<li class="sidebar-header">
+											Pages
+									</li>
 
-    <div class="container-fluid">
-        <div class="row">
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                <div class="position-sticky pt-3 sidebar-sticky">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url 'dashboard' %}">
-                                <span data-feather="home" class="align-text-bottom"></span> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'quotation:list' %}">
-                                <span data-feather="file" class="align-text-bottom"></span> Quotations
-                            </a>
-                        </li>
-												<li class="nav-item">
-													<a class="nav-link" href="{% url 'importchart:list' %}">
-															<span data-feather="file" class="align-text-bottom"></span> Import Charts
+									<li class="sidebar-item active">
+											<a class="sidebar-link" href="{% url 'dashboard' %}">
+													<i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboard</span>
+											</a>
+									</li>
+
+									<li class="sidebar-item">
+											<a class="sidebar-link" href="{% url 'quotation:list' %}">
+													<i class="align-middle" data-feather="user"></i> <span class="align-middle">Quotations</span>
+											</a>
+									</li>
+
+									<li class="sidebar-item">
+											<a class="sidebar-link" href="{% url 'importchart:list' %}">
+													<i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Import Charts</span>
+											</a>
+									</li>
+
+									{% comment %} <li class="sidebar-item">
+											<a class="sidebar-link" href="pages-sign-up.html">
+													<i class="align-middle" data-feather="user-plus"></i> <span class="align-middle">Sign Up</span>
+											</a>
+									</li>
+
+									<li class="sidebar-item">
+											<a class="sidebar-link" href="pages-blank.html">
+													<i class="align-middle" data-feather="book"></i> <span class="align-middle">Blank</span>
+											</a>
+									</li> {% endcomment %}
+
+									{% comment %} <li class="sidebar-header">
+											Tools & Components
+									</li>
+
+									<li class="sidebar-item">
+											<a class="sidebar-link" href="ui-buttons.html">
+													<i class="align-middle" data-feather="square"></i> <span class="align-middle">Buttons</span>
+											</a>
+									</li>
+
+									<li class="sidebar-item">
+											<a class="sidebar-link" href="ui-forms.html">
+													<i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Forms</span>
+											</a>
+									</li>
+
+									<li class="sidebar-item">
+											<a class="sidebar-link" href="ui-cards.html">
+													<i class="align-middle" data-feather="grid"></i> <span class="align-middle">Cards</span>
+											</a>
+									</li>
+
+									<li class="sidebar-item">
+											<a class="sidebar-link" href="ui-typography.html">
+													<i class="align-middle" data-feather="align-left"></i> <span class="align-middle">Typography</span>
+											</a>
+									</li>
+
+									<li class="sidebar-item">
+											<a class="sidebar-link" href="icons-feather.html">
+													<i class="align-middle" data-feather="coffee"></i> <span class="align-middle">Icons</span>
+											</a>
+									</li>
+
+									<li class="sidebar-header">
+											Plugins & Addons
+									</li>
+
+									<li class="sidebar-item">
+											<a class="sidebar-link" href="charts-chartjs.html">
+													<i class="align-middle" data-feather="bar-chart-2"></i> <span class="align-middle">Charts</span>
+											</a>
+									</li>
+
+									<li class="sidebar-item">
+											<a class="sidebar-link" href="maps-google.html">
+													<i class="align-middle" data-feather="map"></i> <span class="align-middle">Maps</span>
+											</a>
+									</li> {% endcomment %}
+							</ul>
+
+					</div>
+			</nav>
+
+			<div class="main">
+					<nav class="navbar navbar-expand navbar-light navbar-bg">
+							<a class="sidebar-toggle js-sidebar-toggle">
+									<i class="hamburger align-self-center"></i>
+							</a>
+
+							<div class="navbar-collapse collapse">
+									<ul class="navbar-nav navbar-align">
+											<li class="nav-item dropdown">
+													<a class="nav-icon dropdown-toggle" href="#" id="alertsDropdown" data-bs-toggle="dropdown">
+															<div class="position-relative">
+																	<i class="align-middle" data-feather="bell"></i>
+																	<span class="indicator">4</span>
+															</div>
 													</a>
+													<div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0" aria-labelledby="alertsDropdown">
+															<div class="dropdown-menu-header">
+																	4 New Notifications
+															</div>
+															<div class="list-group">
+																	<a href="#" class="list-group-item">
+																			<div class="row g-0 align-items-center">
+																					<div class="col-2">
+																							<i class="text-danger" data-feather="alert-circle"></i>
+																					</div>
+																					<div class="col-10">
+																							<div class="text-dark">Update completed</div>
+																							<div class="text-muted small mt-1">Restart server 12 to complete the update.</div>
+																							<div class="text-muted small mt-1">30m ago</div>
+																					</div>
+																			</div>
+																	</a>
+																	<a href="#" class="list-group-item">
+																			<div class="row g-0 align-items-center">
+																					<div class="col-2">
+																							<i class="text-warning" data-feather="bell"></i>
+																					</div>
+																					<div class="col-10">
+																							<div class="text-dark">Lorem ipsum</div>
+																							<div class="text-muted small mt-1">Aliquam ex eros, imperdiet vulputate hendrerit et.</div>
+																							<div class="text-muted small mt-1">2h ago</div>
+																					</div>
+																			</div>
+																	</a>
+																	<a href="#" class="list-group-item">
+																			<div class="row g-0 align-items-center">
+																					<div class="col-2">
+																							<i class="text-primary" data-feather="home"></i>
+																					</div>
+																					<div class="col-10">
+																							<div class="text-dark">Login from 192.186.1.8</div>
+																							<div class="text-muted small mt-1">5h ago</div>
+																					</div>
+																			</div>
+																	</a>
+																	<a href="#" class="list-group-item">
+																			<div class="row g-0 align-items-center">
+																					<div class="col-2">
+																							<i class="text-success" data-feather="user-plus"></i>
+																					</div>
+																					<div class="col-10">
+																							<div class="text-dark">New connection</div>
+																							<div class="text-muted small mt-1">Christina accepted your request.</div>
+																							<div class="text-muted small mt-1">14h ago</div>
+																					</div>
+																			</div>
+																	</a>
+															</div>
+															<div class="dropdown-menu-footer">
+																	<a href="#" class="text-muted">Show all notifications</a>
+															</div>
+													</div>
 											</li>
-                        <!-- <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span data-feather="shopping-cart" class="align-text-bottom"></span> Products
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span data-feather="users" class="align-text-bottom"></span> Customers
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span data-feather="bar-chart-2" class="align-text-bottom"></span> Reports
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span data-feather="layers" class="align-text-bottom"></span> Integrations
-                    </a>
-                </li> -->
-                    </ul>
+											<li class="nav-item dropdown">
+													<a class="nav-icon dropdown-toggle" href="#" id="messagesDropdown" data-bs-toggle="dropdown">
+															<div class="position-relative">
+																	<i class="align-middle" data-feather="message-square"></i>
+															</div>
+													</a>
+													<div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0" aria-labelledby="messagesDropdown">
+															<div class="dropdown-menu-header">
+																	<div class="position-relative">
+																			4 New Messages
+																	</div>
+															</div>
+															<div class="list-group">
+																	<a href="#" class="list-group-item">
+																			<div class="row g-0 align-items-center">
+																					<div class="col-2">
+																							<img src="{% static 'dashboard/img/avatars/avatar-5.jpg' %}" class="avatar img-fluid rounded-circle" alt="Vanessa Tucker">
+																					</div>
+																					<div class="col-10 ps-2">
+																							<div class="text-dark">Vanessa Tucker</div>
+																							<div class="text-muted small mt-1">Nam pretium turpis et arcu. Duis arcu tortor.</div>
+																							<div class="text-muted small mt-1">15m ago</div>
+																					</div>
+																			</div>
+																	</a>
+																	<a href="#" class="list-group-item">
+																			<div class="row g-0 align-items-center">
+																					<div class="col-2">
+																							<img src="{% static 'dashboard/img/avatars/avatar-2.jpg' %}" class="avatar img-fluid rounded-circle" alt="William Harris">
+																					</div>
+																					<div class="col-10 ps-2">
+																							<div class="text-dark">William Harris</div>
+																							<div class="text-muted small mt-1">Curabitur ligula sapien euismod vitae.</div>
+																							<div class="text-muted small mt-1">2h ago</div>
+																					</div>
+																			</div>
+																	</a>
+																	<a href="#" class="list-group-item">
+																			<div class="row g-0 align-items-center">
+																					<div class="col-2">
+																							<img src="{% static 'dashboard/img/avatars/avatar-4.jpg' %}" class="avatar img-fluid rounded-circle" alt="Christina Mason">
+																					</div>
+																					<div class="col-10 ps-2">
+																							<div class="text-dark">Christina Mason</div>
+																							<div class="text-muted small mt-1">Pellentesque auctor neque nec urna.</div>
+																							<div class="text-muted small mt-1">4h ago</div>
+																					</div>
+																			</div>
+																	</a>
+																	<a href="#" class="list-group-item">
+																			<div class="row g-0 align-items-center">
+																					<div class="col-2">
+																							<img src="{% static 'dashboard/img/avatars/avatar-3.jpg' %}"  class="avatar img-fluid rounded-circle" alt="Sharon Lessman">
+																					</div>
+																					<div class="col-10 ps-2">
+																							<div class="text-dark">Sharon Lessman</div>
+																							<div class="text-muted small mt-1">Aenean tellus metus, bibendum sed, posuere ac, mattis non.</div>
+																							<div class="text-muted small mt-1">5h ago</div>
+																					</div>
+																			</div>
+																	</a>
+															</div>
+															<div class="dropdown-menu-footer">
+																	<a href="#" class="text-muted">Show all messages</a>
+															</div>
+													</div>
+											</li>
+											<li class="nav-item dropdown">
+													<a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#" data-bs-toggle="dropdown">
+															<i class="align-middle" data-feather="settings"></i>
+													</a>
 
-                    <!-- <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
-                <span>Saved reports</span>
-                <a class="link-secondary" href="#" aria-label="Add a new report">
-                    <span data-feather="plus-circle" class="align-text-bottom"></span>
-                </a>
-            </h6>
-            <ul class="nav flex-column mb-2">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span data-feather="file-text" class="align-text-bottom"></span> Current month
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span data-feather="file-text" class="align-text-bottom"></span> Last quarter
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span data-feather="file-text" class="align-text-bottom"></span> Social engagement
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span data-feather="file-text" class="align-text-bottom"></span> Year-end sale
-                    </a>
-                </li>
-            </ul> -->
-                </div>
-            </nav>
+													<a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
+															<img src="{% static 'dashboard/img/avatars/avatar.jpg' %}"  class="avatar img-fluid rounded me-1" alt="Charles Hall" /> <span class="text-dark">Charles Hall</span>
+													</a>
+													<div class="dropdown-menu dropdown-menu-end">
+															<a class="dropdown-item" href="pages-profile.html"><i class="align-middle me-1" data-feather="user"></i> Profile</a>
+															<a class="dropdown-item" href="#"><i class="align-middle me-1" data-feather="pie-chart"></i> Analytics</a>
+															<div class="dropdown-divider"></div>
+															<a class="dropdown-item" href="index.html"><i class="align-middle me-1" data-feather="settings"></i> Settings & Privacy</a>
+															<a class="dropdown-item" href="#"><i class="align-middle me-1" data-feather="help-circle"></i> Help Center</a>
+															<div class="dropdown-divider"></div>
+															<a class="dropdown-item" href="#">Log out</a>
+													</div>
+											</li>
+									</ul>
+							</div>
+					</nav>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+					<main class="content">
+							<div class="container-fluid p-0">
                 {% block content %} {% endblock %}
+							</div>
             </main>
+
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row text-muted">
+                        <div class="col-6 text-start">
+                            <p class="mb-0">
+                                <a class="text-muted" href="https://adminkit.io/" target="_blank"><strong>AdminKit</strong></a> - <a class="text-muted" href="https://adminkit.io/" target="_blank"><strong>Bootstrap Admin Template</strong></a> &copy;
+                            </p>
+                        </div>
+                        <div class="col-6 text-end">
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="https://adminkit.io/" target="_blank">Support</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="https://adminkit.io/" target="_blank">Help Center</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="https://adminkit.io/" target="_blank">Privacy</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="https://adminkit.io/" target="_blank">Terms</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
-
-
     </div>
 
-    {% include 'base/js.html' %}
-</body>
 
+</body>
 
 </html>

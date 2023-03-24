@@ -85,3 +85,6 @@ coverage html
 
 # run pytest
  docker-compose run --rm app pytest
+
+#collect static
+docker-compose run --rm app python3 manage.py collectstatic

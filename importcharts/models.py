@@ -12,7 +12,7 @@ class Import(models.Model):
 	total_price = models.DecimalField(max_digits=12,decimal_places=2)
 	total_weight_tons = models.DecimalField(max_digits=7,decimal_places=2)
 	total_weight_kg = models.DecimalField(max_digits=9,decimal_places=2)
-	price_per_kg = models.DecimalField(max_digits=5,decimal_places=2)
+	price_per_kg = models.DecimalField(max_digits=7,decimal_places=2)
 
 	def __str__(self):
 		return f'{self.country}-{self.production_description}-{self.total_price}'
