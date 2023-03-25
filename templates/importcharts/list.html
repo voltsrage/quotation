@@ -27,14 +27,15 @@
 
 																<div class="col-auto">
 																		<div class="stat text-primary">
-																				<i class="align-middle" data-feather="users"></i>
+																				<i class="align-middle" data-feather="info"></i>
 																		</div>
 																</div>
 														</div>
-														<h1 class="mt-1 mb-3">{{total_weight_tons_per_animal_ytd|index:5|dictvalue:'total_weight'}} tons</h1>
+														<h1 class="mt-1 mb-3" id='shrimpThisYearWeightId'>{{total_weight_tons_per_animal_ytd|index:5|dictvalue:'total_weight'}} tons</h1>
 														<div class="mb-0">
-																<span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i> {{total_weight_tons_per_animal_ytd_last_year|index:5|dictvalue:'total_weight'}} tons </span>
-																<span class="text-muted">Last Year </span>
+															<span class="text-muted">Last Year: </span>
+																<span id='shrimpLastYearWeightId'> <i class="mdi mdi-arrow-bottom-right"></i> {{total_weight_tons_per_animal_ytd_last_year|index:5|dictvalue:'total_weight'}} tons </span>
+
 														</div>
 												</div>
 										</div>
@@ -50,14 +51,15 @@
 
 															<div class="col-auto">
 																	<div class="stat text-primary">
-																			<i class="align-middle" data-feather="users"></i>
+																			<i class="align-middle" data-feather="info"></i>
 																	</div>
 															</div>
 													</div>
-													<h1 class="mt-1 mb-3">{{total_weight_tons_per_animal_ytd|index:0|dictvalue:'total_weight'}} tons</h1>
+													<h1 class="mt-1 mb-3" id='crabThisYearWeightId'>{{total_weight_tons_per_animal_ytd|index:0|dictvalue:'total_weight'}} tons</h1>
 													<div class="mb-0">
-															<span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i> {{total_weight_tons_per_animal_ytd_last_year|index:0|dictvalue:'total_weight'}} tons </span>
-															<span class="text-muted">Last Year </span>
+														<span class="text-muted">Last Year: </span>
+															<span  id='crabLastYearWeightId'> <i class="mdi mdi-arrow-bottom-right"></i> {{total_weight_tons_per_animal_ytd_last_year|index:0|dictvalue:'total_weight'}} tons </span>
+
 													</div>
 											</div>
 									</div>
@@ -73,14 +75,15 @@
 
 														<div class="col-auto">
 																<div class="stat text-primary">
-																		<i class="align-middle" data-feather="users"></i>
+																		<i class="align-middle" data-feather="info"></i>
 																</div>
 														</div>
 												</div>
-												<h1 class="mt-1 mb-3">{{total_weight_tons_per_animal_ytd|index:4|dictvalue:'total_weight'}} tons</h1>
+												<h1 class="mt-1 mb-3" id='scallopThisYearWeightId'>{{total_weight_tons_per_animal_ytd|index:4|dictvalue:'total_weight'}} tons</h1>
 												<div class="mb-0">
-														<span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i> {{total_weight_tons_per_animal_ytd_last_year|index:4|dictvalue:'total_weight'}} tons </span>
-														<span class="text-muted">Last Year </span>
+													<span class="text-muted">Last Year: </span>
+														<span  id='scallopLastYearWeightId'> <i class="mdi mdi-arrow-bottom-right"></i> {{total_weight_tons_per_animal_ytd_last_year|index:4|dictvalue:'total_weight'}} tons </span>
+
 												</div>
 										</div>
 								</div>
@@ -96,14 +99,15 @@
 
 																<div class="col-auto">
 																		<div class="stat text-primary">
-																				<i class="align-middle" data-feather="shopping-cart"></i>
+																				<i class="align-middle" data-feather="info"></i>
 																		</div>
 																</div>
 														</div>
-														<h1 class="mt-1 mb-3">{{total_weight_tons_per_animal_ytd|index:2|dictvalue:'total_weight'}} tons</h1>
+														<h1 class="mt-1 mb-3" id='lobsterThisYearWeightId'>{{total_weight_tons_per_animal_ytd|index:2|dictvalue:'total_weight'}} tons</h1>
 														<div class="mb-0">
-																<span class="text-danger"> <i class="mdi mdi-arrow-bottom-right"></i> {{total_weight_tons_per_animal_ytd_last_year|index:2|dictvalue:'total_weight'}} tons </span>
-																<span class="text-muted">Last Year </span>
+															<span class="text-muted">Last Year: </span>
+																<span  id='lobsterLastYearWeightId'> <i class="mdi mdi-arrow-bottom-right"></i> {{total_weight_tons_per_animal_ytd_last_year|index:2|dictvalue:'total_weight'}} tons </span>
+
 														</div>
 												</div>
 										</div>
@@ -119,14 +123,15 @@
 
 															<div class="col-auto">
 																	<div class="stat text-primary">
-																			<i class="align-middle" data-feather="shopping-cart"></i>
+																			<i class="align-middle" data-feather="info"></i>
 																	</div>
 															</div>
 													</div>
-													<h1 class="mt-1 mb-3">{{total_weight_tons_per_animal_ytd|index:3|dictvalue:'total_weight'}} tons</h1>
+													<h1 class="mt-1 mb-3" id='salmonThisYearWeightId'>{{total_weight_tons_per_animal_ytd|index:3|dictvalue:'total_weight'}} tons</h1>
 													<div class="mb-0">
-															<span class="text-danger"> <i class="mdi mdi-arrow-bottom-right"></i> {{total_weight_tons_per_animal_ytd_last_year|index:3|dictvalue:'total_weight'}} tons </span>
-															<span class="text-muted">Last Year </span>
+														<span class="text-muted">Last Year: </span>
+															<span  id='salmonLastYearWeightId'> <i class="mdi mdi-arrow-bottom-right"></i> {{total_weight_tons_per_animal_ytd_last_year|index:3|dictvalue:'total_weight'}} tons </span>
+
 													</div>
 											</div>
 									</div>
@@ -142,14 +147,15 @@
 
 														<div class="col-auto">
 																<div class="stat text-primary">
-																		<i class="align-middle" data-feather="dollar-sign"></i>
+																		<i class="align-middle" data-feather="info"></i>
 																</div>
 														</div>
 												</div>
-												<h1 class="mt-1 mb-3">{{total_weight_tons_per_animal_ytd|index:1|dictvalue:'total_weight'}} tons</h1>
+												<h1 class="mt-1 mb-3" id='halibutThisYearWeightId'>{{total_weight_tons_per_animal_ytd|index:1|dictvalue:'total_weight'}} tons</h1>
 												<div class="mb-0">
-														<span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i> {{total_weight_tons_per_animal_ytd_last_year|index:1|dictvalue:'total_weight'}} tons </span>
-														<span class="text-muted">Last Year </span>
+														<span class="text-muted">Last Year: </span>
+														<span  id='halibutLastYearWeightId'> <i class="mdi mdi-arrow-bottom-right"></i> {{total_weight_tons_per_animal_ytd_last_year|index:1|dictvalue:'total_weight'}} tons </span>
+
 												</div>
 										</div>
 								</div>
@@ -179,6 +185,7 @@
 
 										</div>
 										<form class="container-fluid my-4" method="post" id="uploadExcel_form">
+
 												<div class='modal-body'>
 
 														{% csrf_token %}
@@ -338,14 +345,132 @@
 		$(document).ready(function() {
 				// when user clicks add more btn of sizeprices
 
+				function checkCurrentToLastYear(currentYear,lastYear,element)
+				{
+					element.removeClass('text-danger')
+					element.removeClass('text-success')
+
+					if(parseFloat(lastYear) > parseFloat(currentYear)){
+						element.addClass('text-danger')
+					}
+					else{
+						element.addClass('text-success')
+					}
+				}
+
+				$.ajax({
+					url: "{% url 'importchart:get_current_ytd_weight' %}",
+					success: function (data) {
+						// Replace the table with the updated one
+
+						checkCurrentToLastYear(data.total_weight_tons_per_animal_ytd[5].total_weight,data.total_weight_tons_per_animal_ytd_last_year[5].total_weight,$('#shrimpLastYearWeightId'))
+
+						checkCurrentToLastYear(data.total_weight_tons_per_animal_ytd[0].total_weight,data.total_weight_tons_per_animal_ytd_last_year[0].total_weight,$('#crabLastYearWeightId'))
+
+						checkCurrentToLastYear(data.total_weight_tons_per_animal_ytd[4].total_weight,data.total_weight_tons_per_animal_ytd_last_year[4].total_weight,$('#scallopLastYearWeightId'))
+
+						checkCurrentToLastYear(data.total_weight_tons_per_animal_ytd[2].total_weight,data.total_weight_tons_per_animal_ytd_last_year[2].total_weight,$('#lobsterLastYearWeightId'))
+
+						checkCurrentToLastYear(data.total_weight_tons_per_animal_ytd[3].total_weight,data.total_weight_tons_per_animal_ytd_last_year[3].total_weight,$('#salmonLastYearWeightId'))
+
+						checkCurrentToLastYear(data.total_weight_tons_per_animal_ytd[1].total_weight,data.total_weight_tons_per_animal_ytd_last_year[1].total_weight,$('#halibutLastYearWeightId'))
+					},
+					error: function (xhr, status, error) {
+						console.error("AJAX error:", status, error);
+					},
+				});
+
 				$('#ytdTotal').on('click',function(){
 					$('.animalTotals .page-item').removeClass('active')
 					$('#ytdTotal').parent().addClass('active')
+
+					$.ajax({
+						url: "{% url 'importchart:get_current_ytd_weight' %}",
+						success: function (data) {
+							// Replace the table with the updated one
+
+							$('#shrimpThisYearWeightId').text(`${data.total_weight_tons_per_animal_ytd[5].total_weight} tons`)
+							$('#shrimpLastYearWeightId').text(`${data.total_weight_tons_per_animal_ytd_last_year[5].total_weight} tons`)
+
+							checkCurrentToLastYear(data.total_weight_tons_per_animal_ytd[5].total_weight,data.total_weight_tons_per_animal_ytd_last_year[5].total_weight,$('#shrimpLastYearWeightId'))
+
+							$('#crabThisYearWeightId').text(`${data.total_weight_tons_per_animal_ytd[0].total_weight} tons`)
+							$('#crabLastYearWeightId').text(`${data.total_weight_tons_per_animal_ytd_last_year[0].total_weight} tons`)
+
+							checkCurrentToLastYear(data.total_weight_tons_per_animal_ytd[0].total_weight,data.total_weight_tons_per_animal_ytd_last_year[0].total_weight,$('#crabLastYearWeightId'))
+
+							$('#scallopThisYearWeightId').text(`${data.total_weight_tons_per_animal_ytd[4].total_weight} tons`)
+							$('#scallopLastYearWeightId').text(`${data.total_weight_tons_per_animal_ytd_last_year[4].total_weight} tons`)
+
+							checkCurrentToLastYear(data.total_weight_tons_per_animal_ytd[4].total_weight,data.total_weight_tons_per_animal_ytd_last_year[4].total_weight,$('#scallopLastYearWeightId'))
+
+							$('#lobsterThisYearWeightId').text(`${data.total_weight_tons_per_animal_ytd[2].total_weight} tons`)
+							$('#lobsterLastYearWeightId').text(`${data.total_weight_tons_per_animal_ytd_last_year[2].total_weight} tons`)
+
+							checkCurrentToLastYear(data.total_weight_tons_per_animal_ytd[2].total_weight,data.total_weight_tons_per_animal_ytd_last_year[2].total_weight,$('#lobsterLastYearWeightId'))
+
+							$('#salmonThisYearWeightId').text(`${data.total_weight_tons_per_animal_ytd[3].total_weight} tons`)
+							$('#salmonLastYearWeightId').text(`${data.total_weight_tons_per_animal_ytd_last_year[3].total_weight} tons`)
+
+							checkCurrentToLastYear(data.total_weight_tons_per_animal_ytd[3].total_weight,data.total_weight_tons_per_animal_ytd_last_year[3].total_weight,$('#salmonLastYearWeightId'))
+
+							$('#halibutThisYearWeightId').text(`${data.total_weight_tons_per_animal_ytd[1].total_weight} tons`)
+							$('#halibutLastYearWeightId').text(`${data.total_weight_tons_per_animal_ytd_last_year[1].total_weight} tons`)
+
+							checkCurrentToLastYear(data.total_weight_tons_per_animal_ytd[1].total_weight,data.total_weight_tons_per_animal_ytd_last_year[1].total_weight,$('#halibutLastYearWeightId'))
+						},
+						error: function (xhr, status, error) {
+							console.error("AJAX error:", status, error);
+						},
+					});
+
+
+
 				})
 
 				$('#monthTotal').on('click',function(){
 					$('.animalTotals .page-item').removeClass('active')
 					$('#monthTotal').parent().addClass('active')
+
+					$.ajax({
+						url: "{% url 'importchart:get_current_month_weight' %}",
+						success: function (data) {
+							// Replace the table with the updated one
+
+							$('#shrimpThisYearWeightId').text(`${data.total_weight_tons_per_animal_month[5].total_weight} tons`)
+							$('#shrimpLastYearWeightId').text(`${data.total_weight_tons_per_animal_month_last_year[5].total_weight} tons`)
+
+							checkCurrentToLastYear(data.total_weight_tons_per_animal_month[5].total_weight,data.total_weight_tons_per_animal_month_last_year[5].total_weight,$('#shrimpLastYearWeightId'))
+
+							$('#crabThisYearWeightId').text(`${data.total_weight_tons_per_animal_month[0].total_weight} tons`)
+							$('#crabLastYearWeightId').text(`${data.total_weight_tons_per_animal_month_last_year[0].total_weight} tons`)
+
+							checkCurrentToLastYear(data.total_weight_tons_per_animal_month[0].total_weight,data.total_weight_tons_per_animal_month_last_year[0].total_weight,$('#crabLastYearWeightId'))
+
+							$('#scallopThisYearWeightId').text(`${data.total_weight_tons_per_animal_month[4].total_weight} tons`)
+							$('#scallopLastYearWeightId').text(`${data.total_weight_tons_per_animal_month_last_year[4].total_weight} tons`)
+
+							checkCurrentToLastYear(data.total_weight_tons_per_animal_month[4].total_weight,data.total_weight_tons_per_animal_month_last_year[4].total_weight,$('#scallopLastYearWeightId'))
+
+							$('#lobsterThisYearWeightId').text(`${data.total_weight_tons_per_animal_month[2].total_weight} tons`)
+							$('#lobsterLastYearWeightId').text(`${data.total_weight_tons_per_animal_month_last_year[2].total_weight} tons`)
+
+							checkCurrentToLastYear(data.total_weight_tons_per_animal_month[2].total_weight,data.total_weight_tons_per_animal_month_last_year[2].total_weight,$('#lobsterLastYearWeightId'))
+
+							$('#salmonThisYearWeightId').text(`${data.total_weight_tons_per_animal_month[3].total_weight} tons`)
+							$('#salmonLastYearWeightId').text(`${data.total_weight_tons_per_animal_month_last_year[3].total_weight} tons`)
+
+							checkCurrentToLastYear(data.total_weight_tons_per_animal_month[3].total_weight,data.total_weight_tons_per_animal_month_last_year[3].total_weight,$('#salmonLastYearWeightId'))
+
+							$('#halibutThisYearWeightId').text(`${data.total_weight_tons_per_animal_month[1].total_weight} tons`)
+							$('#halibutLastYearWeightId').text(`${data.total_weight_tons_per_animal_month_last_year[1].total_weight} tons`)
+
+							checkCurrentToLastYear(data.total_weight_tons_per_animal_month[1].total_weight,data.total_weight_tons_per_animal_month_last_year[1].total_weight,$('#halibutLastYearWeightId'))
+						},
+						error: function (xhr, status, error) {
+							console.error("AJAX error:", status, error);
+						},
+					});
 				})
 
 				var updateTable = function(page){

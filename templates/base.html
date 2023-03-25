@@ -25,29 +25,39 @@
 			<nav id="sidebar" class="sidebar js-sidebar">
 					<div class="sidebar-content js-simplebar">
 							<a class="sidebar-brand" href="index.html">
-									<span class="align-middle">AdminKit</span>
+									<span class="align-middle">Dana Project</span>
 							</a>
 
 							<ul class="sidebar-nav">
 									<li class="sidebar-header">
-											Pages
+											Quotations
 									</li>
-
+									<li class="sidebar-item">
+										<a class="sidebar-link" href="{% url 'quotation:list' %}">
+												<i class="align-middle" data-feather="user"></i> <span class="align-middle">Manage</span>
+										</a>
+								</li>
 									<li class="sidebar-item active">
 											<a class="sidebar-link" href="{% url 'dashboard' %}">
 													<i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboard</span>
 											</a>
 									</li>
 
-									<li class="sidebar-item">
-											<a class="sidebar-link" href="{% url 'quotation:list' %}">
-													<i class="align-middle" data-feather="user"></i> <span class="align-middle">Quotations</span>
-											</a>
+
+
+									<li class="sidebar-header">
+											Imports
 									</li>
 
 									<li class="sidebar-item">
 											<a class="sidebar-link" href="{% url 'importchart:list' %}">
-													<i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Import Charts</span>
+													<i class="align-middle" data-feather="square"></i> <span class="align-middle">Manage</span>
+											</a>
+									</li>
+
+									<li class="sidebar-item">
+											<a class="sidebar-link" href="#">
+													<i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Dashboard</span>
 											</a>
 									</li>
 
@@ -317,6 +327,11 @@
     {% include 'base/js.html' %}
     <script src="{% static 'dashboard/app.js' %}"></script>
 
+<script>
+	document.body.addEventListener('htmx:configRequest', (event) => {
+			event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+	})
+</script>
 </body>
 
 </html>

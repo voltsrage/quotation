@@ -1,7 +1,7 @@
 {% load crispy_forms_tags %}
 
 <form action="." method='POST' style='width: 95%;' hx-post='.' hx-swap='outerHTML' novalidate>
-    {%csrf_token%}
+    {% csrf_token %}
     <fieldset>
         <legend>Date</legend>
         {{form.recieved_date| as_crispy_field }}

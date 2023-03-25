@@ -4,7 +4,7 @@
 
 	<form id="filters" class="row g-3">
 
-
+		{% csrf_token %}
 		<div class="col-md-6">
 			<label for="supplier" class="form-label">Supplier:</label>
 			<select name="supplier" id="supplier" class='form-control'>
@@ -82,7 +82,7 @@
 <div class="pt-3 pb-2 mb-3 border-bottom border-top">
 
 	<form id="filter-form" class="row g-3">
-
+		{% csrf_token %}
 		<div class="col-md-6">
 			<label for="yearM" class="form-label">Years:</label>
 			<select name="yearM" id="yearM" class='form-control'  multiple="multiple">

@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from .models import Import
 from django.db.models import Avg,Max,Min,Sum,Count, Q,F,Case, Value, When,ExpressionWrapper, DecimalField
 from django.db import IntegrityError
-from quotation.models import Country
+from quotation.models import Country,Animal
 
 # Create your views here.
 def ImportChartListViewSet(request):
@@ -35,6 +35,60 @@ def ImportChartListViewSet(request):
 			}
 	return render(request,'importcharts/list.html',context)
 
+def get_current_month_weight(request):
+	total_weight_tons_per_animal_month =Animal.objects.raw('''SELECT Id ,NAME, SUM(total_weight) as total_weight FROM
+				(SELECT A.Id,A.name, SUM(coalesce(I.total_weight_tons,0)) total_weight
+				FROM public.quotation_animal A
+				LEFT JOIN public.importcharts_import I ON I.animal_id = A.Id
+				WHERE EXTRACT (YEAR FROM I.month) = EXTRACT(YEAR FROM now())  AND
+					EXTRACT (MONTH FROM I.month) = EXTRACT(MONTH FROM now()) -1
+				GROUP BY A.Id,A.name
+				UNION
+				SELECT A.Id,A.name, 0 FROM public.quotation_animal A) S
+				GROUP BY Id ,name
+				ORDER BY NAME''')
+
+	total_weight_tons_per_animal_month_last_year = Animal.objects.raw('''SELECT Id ,NAME, SUM(total_weight) as total_weight FROM
+				(SELECT A.Id,A.name, SUM(coalesce(I.total_weight_tons,0)) total_weight
+				FROM public.quotation_animal A
+				LEFT JOIN public.importcharts_import I ON I.animal_id = A.Id
+				WHERE EXTRACT (YEAR FROM I.month) = EXTRACT(YEAR FROM now()) - 1  AND
+					EXTRACT (MONTH FROM I.month) = EXTRACT(MONTH FROM now()) - 1
+				GROUP BY A.Id,A.name
+				UNION
+				SELECT A.Id,A.name, 0 FROM public.quotation_animal A) S
+				GROUP BY Id ,name
+				ORDER BY NAME''')
+
+	animal_month = []
+	for animal in total_weight_tons_per_animal_month:
+		animal_month.append({
+			'name':animal.name,
+			'total_weight':animal.total_weight
+		})
+
+	animal_month_last_year = []
+	for animal in total_weight_tons_per_animal_month_last_year:
+		animal_month_last_year.append({
+			'name':animal.name,
+			'total_weight':animal.total_weight
+		})
+
+	context = {
+				'total_weight_tons_per_animal_month':animal_month,
+				'total_weight_tons_per_animal_month_last_year':animal_month_last_year
+			}
+	return JsonResponse(context)
+
+def get_current_ytd_weight(request):
+	imports = Import.objects.all()
+	total_weight_tons_per_animal_ytd = imports.filter(month__year=datetime.date.today().year).values('animal__name').annotate(total_weight=Sum('total_weight_tons')).order_by('animal__name')
+	total_weight_tons_per_animal_ytd_last_year = imports.filter(Q(month__year=datetime.date.today().year-1) &  Q(month__month__lte=datetime.date.today().month)).values('animal__name').annotate(total_weight=Sum('total_weight_tons')).order_by('animal__name')
+	context = {
+				'total_weight_tons_per_animal_ytd':list(total_weight_tons_per_animal_ytd),
+				'total_weight_tons_per_animal_ytd_last_year':list(total_weight_tons_per_animal_ytd_last_year)
+			}
+	return JsonResponse(context)
 
 def import_file(request):
 	data = Import.objects.all()

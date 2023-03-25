@@ -3,9 +3,11 @@ import random
 from django.core.management.base import BaseCommand
 from faker import Faker
 from quotation.models import Supplier,Quotation,SizePrice,SizePriceBoxNetWeight,Specie,Country,Port
+from importcharts.models import *
 from django.db.models import Avg,Max,Min,Sum,Count, Q,F,Case, Value, When,ExpressionWrapper, DecimalField
 from django.db import connection
 from decimal import Decimal
+import datetime
 
 picture_list = [
 	'quotations/products/freshwater-shrimp-species.jpg',
@@ -200,11 +202,11 @@ class Command(BaseCommand):
 		# get_quotation_value_list = Quotation.objects.all().only("destination","supplier", 'tax' ,'recieved_date')
 		# print(get_quotation_value_list)
 
-		print()
-		print('-----------------------------------------------------------------------')
-		print()
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
 
-		get_kg_sizeprice = Quotation.objects.all()[:10]
+		# get_kg_sizeprice = Quotation.objects.all()[:10]
 
 		# get_kg_sizeprice = Quotation.objects.filter(Q(sizeprices__price_unit_id=3) | Q(sizeprices__price_unit_id=2) | Q(sizeprices__price_unit_id=1) ).annotate(
 		# 	price_in_kg = Case(
@@ -262,53 +264,51 @@ class Command(BaseCommand):
 
 		# print(supplier_quotes_yearly)
 
-		print()
-		print('-----------------------------------------------------------------------')
-		print()
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
 
-		quotes_yearly = Quotation.objects.all().values('recieved_date__year').annotate(
-			num_of_quotes=Avg(Case (
-				When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
-				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
-				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
-				default=Decimal(0.0))
-			)
-			).order_by('recieved_date__year')
+		# quotes_yearly = Quotation.objects.all().values('recieved_date__year').annotate(
+		# 	num_of_quotes=Avg(Case (
+		# 		When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
+		# 		When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
+		# 		When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
+		# 		default=Decimal(0.0))
+		# 	)
+		# 	).order_by('recieved_date__year')
 
-		print(quotes_yearly)
+		# print(quotes_yearly)
 
-		print()
-		print('-----------------------------------------------------------------------')
-		print()
+		# print()
+		# print('-----------------------------------------------------------------------')
+		# print()
 
-		quotes_by_specie_yearly = Quotation.objects.all().values('recieved_date__year','specie__name').annotate(
-			num_of_quotes=Avg(Case (
-				When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
-				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
-				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
-				default=Decimal(0.0))
-			)
-			).order_by('recieved_date__year','specie__id')
+		# quotes_by_specie_yearly = Quotation.objects.all().values('recieved_date__year','specie__name').annotate(
+		# 	num_of_quotes=Avg(Case (
+		# 		When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
+		# 		When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
+		# 		When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
+		# 		default=Decimal(0.0))
+		# 	)
+		# 	).order_by('recieved_date__year','specie__id')
 
-		for quotes in quotes_by_specie_yearly:
-			print(quotes)
+		# for quotes in quotes_by_specie_yearly:
+		# 	print(quotes)
 
 
-		print()
-		print('-----------------------------------------------------------------------')
-		print()
 
-		quotes_by_origin_specie_yearly = Quotation.objects.all().values('recieved_date__year','origin__name','specie__name').annotate(
-			num_of_quotes=Avg(Case (
-				When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
-				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
-				When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
-				default=Decimal(0.0))
-			)
-			).order_by('recieved_date__year','origin__name','specie__name')
 
-		for quotes in quotes_by_origin_specie_yearly:
-			print(quotes)
+		# quotes_by_origin_specie_yearly = Quotation.objects.all().values('recieved_date__year','origin__name','specie__name').annotate(
+		# 	num_of_quotes=Avg(Case (
+		# 		When(sizeprices__price_unit_id=1, then=F("sizeprices__price")),
+		# 		When(sizeprices__price_unit_id=2, then=F("sizeprices__price")*Decimal(2.2)),
+		# 		When(sizeprices__price_unit_id=2, then=F("sizeprices__price")/F("sizeprices__netweight__net_weight")),
+		# 		default=Decimal(0.0))
+		# 	)
+		# 	).order_by('recieved_date__year','origin__name','specie__name')
+
+		# for quotes in quotes_by_origin_specie_yearly:
+		# 	print(quotes)
 
 		# # The average, max and min tax required on quotations
 
@@ -325,6 +325,25 @@ class Command(BaseCommand):
 		# print(min_price_each_supplier)
 
 		#print(Specie.objects.all().values_list())
+
+		print()
+		print('-----------------------------------------------------------------------')
+		print()
+
+		total_weight_tons_per_animal_month =Animal.objects.raw('''SELECT Id ,NAME, SUM(total_weight) as total_weight FROM
+				(SELECT A.Id,A.name, SUM(coalesce(I.total_weight_tons,0)) total_weight
+				FROM public.quotation_animal A
+				LEFT JOIN public.importcharts_import I ON I.animal_id = A.Id
+				WHERE EXTRACT (YEAR FROM I.month) = EXTRACT(YEAR FROM now())  AND
+					EXTRACT (MONTH FROM I.month) = EXTRACT(MONTH FROM now()) -1
+				GROUP BY A.Id,A.name
+				UNION
+				SELECT A.Id,A.name, 0 FROM public.quotation_animal A) S
+				GROUP BY Id ,name
+				ORDER BY NAME''')
+		print(total_weight_tons_per_animal_month)
+		for thing in total_weight_tons_per_animal_month:
+			print(f'{thing.name} - {thing.total_weight}')
 
 		print()
 		print(connection.queries)
@@ -356,31 +375,31 @@ class Command(BaseCommand):
 
 		### SizePrice Start ###
 
-		for _ in range(5000):
-			quotation_id = random.randint(1,1000)
-			create_by_id = 1
-			currency_id = random.randint(1,5)
-			price_unit_id = random.randint(1,4)
-			size = fake.quotation_size()
-			price = (round(random.uniform(0.99,19.99),2))
-			price_in_usd = round(price / Decimal(1),2)
-			if currency_id == 1: #twd
-				price_in_usd =  round(price / Decimal(30.67),2)
-			elif currency_id == 2: #usd
-				price_in_usd =  round(price / Decimal(1),2)
-			elif currency_id == 3: #jpy
-				price_in_usd =  round(price / Decimal(132.33),2)
-			elif currency_id == 4: #cny
-				price_in_usd =  round(price / Decimal(6.89),2)
-			elif currency_id ==5: #eur
-				price_in_usd =  round(price / Decimal(0.94),2)
-			SizePrice.objects.get_or_create(quotation_id=quotation_id,
-						create_by_id=create_by_id,
-						currency_id=currency_id,
-						price_unit_id=price_unit_id,
-						price_in_usd = price_in_usd,
-						size=size,
-						price=price)
+		# for _ in range(5000):
+		# 	quotation_id = random.randint(1,1000)
+		# 	create_by_id = 1
+		# 	currency_id = random.randint(1,5)
+		# 	price_unit_id = random.randint(1,4)
+		# 	size = fake.quotation_size()
+		# 	price = (round(random.uniform(0.99,19.99),2))
+		# 	price_in_usd = round(price / Decimal(1),2)
+		# 	if currency_id == 1: #twd
+		# 		price_in_usd =  round(price / Decimal(30.67),2)
+		# 	elif currency_id == 2: #usd
+		# 		price_in_usd =  round(price / Decimal(1),2)
+		# 	elif currency_id == 3: #jpy
+		# 		price_in_usd =  round(price / Decimal(132.33),2)
+		# 	elif currency_id == 4: #cny
+		# 		price_in_usd =  round(price / Decimal(6.89),2)
+		# 	elif currency_id ==5: #eur
+		# 		price_in_usd =  round(price / Decimal(0.94),2)
+		# 	SizePrice.objects.get_or_create(quotation_id=quotation_id,
+		# 				create_by_id=create_by_id,
+		# 				currency_id=currency_id,
+		# 				price_unit_id=price_unit_id,
+		# 				price_in_usd = price_in_usd,
+		# 				size=size,
+		# 				price=price)
 
 		### SizePrice End ###
 
