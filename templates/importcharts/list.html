@@ -25,9 +25,15 @@
 																		<h5 class="card-title">Shrimp</h5>
 																</div>
 
-																<div class="col-auto">
+																<div class="col-auto" >
 																		<div class="stat text-primary">
-																				<i class="align-middle" data-feather="info"></i>
+																				<i class="align-middle productIcon"
+																					data-id={{total_weight_tons_per_animal_ytd|index:5|dictvalue:'id'}}
+																					data-weight={{total_weight_tons_per_animal_ytd|index:5|dictvalue:'total_weight'}}
+																					data-weightMth={{total_weight_tons_per_animal_month|index:5|dictvalue:'total_weight'}}
+																					data-toggle="popover"
+																					title="Shrimp"
+																					data-feather="info"></i>
 																		</div>
 																</div>
 														</div>
@@ -51,7 +57,13 @@
 
 															<div class="col-auto">
 																	<div class="stat text-primary">
-																			<i class="align-middle" data-feather="info"></i>
+																			<i class="align-middle productIcon"
+																				data-id={{total_weight_tons_per_animal_ytd|index:0|dictvalue:'id'}}
+																				data-weight={{total_weight_tons_per_animal_ytd|index:0|dictvalue:'total_weight'}}
+																				data-weightMth={{total_weight_tons_per_animal_month|index:0|dictvalue:'total_weight'}}
+																				data-toggle="popover"
+																				title="Crab"
+																				data-feather="info"></i>
 																	</div>
 															</div>
 													</div>
@@ -75,7 +87,13 @@
 
 														<div class="col-auto">
 																<div class="stat text-primary">
-																		<i class="align-middle" data-feather="info"></i>
+																		<i class="align-middle productIcon"
+																			data-id={{total_weight_tons_per_animal_ytd|index:4|dictvalue:'id'}}
+																			data-weight={{total_weight_tons_per_animal_ytd|index:4|dictvalue:'total_weight'}}
+																			data-weightMth={{total_weight_tons_per_animal_month|index:4|dictvalue:'total_weight'}}
+																			data-toggle="popover"
+																			title="Scallop"
+																			data-feather="info"></i>
 																</div>
 														</div>
 												</div>
@@ -99,7 +117,13 @@
 
 																<div class="col-auto">
 																		<div class="stat text-primary">
-																				<i class="align-middle" data-feather="info"></i>
+																				<i class="align-middle productIcon"
+																					data-id={{total_weight_tons_per_animal_ytd|index:2|dictvalue:'id'}}
+																					data-weight={{total_weight_tons_per_animal_ytd|index:2|dictvalue:'total_weight'}}
+																					data-weightMth={{total_weight_tons_per_animal_month|index:2|dictvalue:'total_weight'}}
+																					data-toggle="popover"
+																					title="Lobster"
+																					data-feather="info"></i>
 																		</div>
 																</div>
 														</div>
@@ -123,7 +147,13 @@
 
 															<div class="col-auto">
 																	<div class="stat text-primary">
-																			<i class="align-middle" data-feather="info"></i>
+																			<i class="align-middle productIcon"
+																				data-id={{total_weight_tons_per_animal_ytd|index:3|dictvalue:'id'}}
+																				data-weight={{total_weight_tons_per_animal_ytd|index:3|dictvalue:'total_weight'}}
+																				data-weightMth={{total_weight_tons_per_animal_month|index:3|dictvalue:'total_weight'}}
+																				data-toggle="popover"
+																				title="Salmon"
+																				data-feather="info"></i>
 																	</div>
 															</div>
 													</div>
@@ -147,7 +177,12 @@
 
 														<div class="col-auto">
 																<div class="stat text-primary">
-																		<i class="align-middle" data-feather="info"></i>
+																		<i class="align-middle productIcon"
+																			data-id={{total_weight_tons_per_animal_ytd|index:1|dictvalue:'id'}}
+																			data-weight={{total_weight_tons_per_animal_ytd|index:1|dictvalue:'total_weight'}}
+																			data-weightMth={{total_weight_tons_per_animal_month|index:1|dictvalue:'total_weight'}}
+																			data-toggle="popover" title="Halibut"
+																			data-feather="info"></i>
 																</div>
 														</div>
 												</div>
@@ -313,8 +348,36 @@
 	</div>
 </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<div class="modal fade" id="tooltip-modal" tabindex="-1" role="dialog" aria-labelledby="tooltip-title" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+			<div class="modal-content">
+					<div class="modal-header">
+							<h5 class="modal-title" id="tooltip-title"></h5>
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+					<div class="modal-body">
+						<p id="tooltip-content"></p>
+				</div>
+			</div>
+	</div>
+</div>
+{% comment %} <div class="modal fade" id="tooltip-modal" tabindex="-1" role="dialog" aria-labelledby="tooltip-title" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+			<div class="modal-content">
+					<div class="modal-header">
+							<h5 class="modal-title" id="tooltip-title"></h5>
+							<button type="button" class="close" bs-data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+							</button>
+					</div>
+					<div class="modal-body">
+							<p id="tooltip-content"></p>
+					</div>
+			</div>
+	</div>
+</div> {% endcomment %}
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 	function updateTablePaging(page){
 
@@ -344,6 +407,86 @@
 	}
 		$(document).ready(function() {
 				// when user clicks add more btn of sizeprices
+				var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+				var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+					return new bootstrap.Popover(popoverTriggerEl)
+				})
+
+				/*
+				$('.productIcon').each(function() {
+					var animal_id = $(this).data('id');
+
+					$(this).popover({
+						html:true,
+						content: function(){
+							var result = '';
+							$.ajax({
+								url: '/importcharts/tooltip/' + animal_id,
+								dataType: 'json',
+								success: function(data) {
+									console.log('data',data)
+									result = '<ul>';
+                    for (var i = 0; i < data.content.length; i++) {
+                        result += '<li>' + data.content[i].name + '</li>';
+                    }
+                    result += '</ul>';
+								}
+							});
+							console.log('result',result)
+							return result;
+						}
+					})
+
+				})*/
+				var popTitle = '';
+				$('.productIcon').popover({
+					html:true,
+					title:'Testing',
+					trigger:'hover',
+					content: function(){
+						var result = '';
+						var weight = $(this).data('weight')
+						var weightMth = $(this).data('weightmth')
+						console.log(weightMth)
+						var isYtd = $('#ytdTotal').parent().hasClass('active')
+					 $.ajax({
+						async: false,
+							url: '/importcharts/tooltip/' + $(this).data('id'),
+							data: {'isYtd':$('#ytdTotal').parent().hasClass('active')},
+							dataType: 'json',
+							success: function(data) {
+								result = '<ul>';
+									if(isYtd) {
+										for (var i = 0; i < data.content.length; i++) {
+											result += '<li>' + data.content[i].name + ': <span class="bold">' + (data.content[i].total_weight * 100/ weight).toFixed(2) + '%</span></li>';
+										}
+									}
+									else{
+										for (var i = 0; i < data.content.length; i++) {
+											result += '<li>' + data.content[i].name + ': <span class="bold">' + (data.content[i].total_weight * 100/ weightMth).toFixed(2) + '%</span></li>';
+										}
+									}
+
+									result += '</ul>';
+									popTitle = data.title
+									console.log(result)
+
+							}
+						});
+						console.log($(this).data('weight'))
+						return result
+					},
+					title:popTitle
+				})
+
+				$('#tooltip-modal').on('hidden.bs.modal', function () {
+					$('#tooltip-content').empty()
+				})
+
+				$('.productIcon').mouseleave(function() {
+					$('#tooltip-modal').modal('hide');
+
+				})
 
 				function checkCurrentToLastYear(currentYear,lastYear,element)
 				{

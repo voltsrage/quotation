@@ -12,12 +12,63 @@ from quotation.models import Country,Animal
 # Create your views here.
 def ImportChartListViewSet(request):
 	imports = Import.objects.all()
-	total_weight_tons_per_animal_ytd = imports.filter(month__year=datetime.date.today().year).values('animal__name').annotate(total_weight=Sum('total_weight_tons')).order_by('animal__name')
-	total_weight_tons_per_animal_ytd_last_year = imports.filter(Q(month__year=datetime.date.today().year-1) &  Q(month__month__lte=datetime.date.today().month)).values('animal__name').annotate(total_weight=Sum('total_weight_tons')).order_by('animal__name')
-	total_weight_tons_per_animal_month = imports.filter(Q(month__year=datetime.date.today().year) & Q(month__month=datetime.date.today().month-1)).values_list('animal__name').annotate(total_weight=Sum('total_weight_tons'))
-	total_weight_tons_per_animal_month_last_year = imports.filter(Q(month__year=datetime.date.today().year-1) & Q(month__month=datetime.date.today().month-1)).values_list('animal__name').annotate(total_weight=Sum('total_weight_tons'))
-	print(list(total_weight_tons_per_animal_ytd))
-	print(list(total_weight_tons_per_animal_ytd_last_year))
+	total_weight_tons_per_animal_ytd =Animal.objects.raw('''SELECT Id ,NAME, SUM(total_weight) as total_weight FROM
+				(SELECT A.Id,A.name, SUM(coalesce(I.total_weight_tons,0)) total_weight
+				FROM public.quotation_animal A
+				LEFT JOIN public.importcharts_import I ON I.animal_id = A.Id
+				WHERE EXTRACT (YEAR FROM I.month) = EXTRACT(YEAR FROM now())
+				GROUP BY A.Id,A.name
+				UNION
+				SELECT A.Id,A.name, 0 FROM public.quotation_animal A) S
+				GROUP BY Id ,name
+				ORDER BY NAME''')
+
+	total_weight_tons_per_animal_ytd_last_year = Animal.objects.raw('''SELECT Id ,NAME, SUM(total_weight) as total_weight FROM
+				(SELECT A.Id,A.name, SUM(coalesce(I.total_weight_tons,0)) total_weight
+				FROM public.quotation_animal A
+				LEFT JOIN public.importcharts_import I ON I.animal_id = A.Id
+				WHERE EXTRACT (YEAR FROM I.month) = EXTRACT(YEAR FROM now()) - 1  AND
+					EXTRACT (MONTH FROM I.month) <= EXTRACT(MONTH FROM now())
+				GROUP BY A.Id,A.name
+				UNION
+				SELECT A.Id,A.name, 0 FROM public.quotation_animal A) S
+				GROUP BY Id ,name
+				ORDER BY NAME''')
+
+	total_weight_tons_per_animal_month =Animal.objects.raw('''SELECT Id ,NAME, SUM(total_weight) as total_weight FROM
+				(SELECT A.Id,A.name, SUM(coalesce(I.total_weight_tons,0)) total_weight
+				FROM public.quotation_animal A
+				LEFT JOIN public.importcharts_import I ON I.animal_id = A.Id
+				WHERE EXTRACT (YEAR FROM I.month) = EXTRACT(YEAR FROM now())  AND
+					EXTRACT (MONTH FROM I.month) = EXTRACT(MONTH FROM now()) -1
+				GROUP BY A.Id,A.name
+				UNION
+				SELECT A.Id,A.name, 0 FROM public.quotation_animal A) S
+				GROUP BY Id ,name
+				ORDER BY NAME''')
+
+	animal_month = []
+	for animal in total_weight_tons_per_animal_ytd:
+		animal_month.append({
+			'id':animal.id,
+			'name':animal.name,
+			'total_weight':animal.total_weight
+		})
+
+	animal_month_month = []
+	for animal in total_weight_tons_per_animal_month:
+		animal_month_month.append({
+			'name':animal.name,
+			'total_weight':animal.total_weight
+		})
+
+	animal_month_last_year = []
+	for animal in total_weight_tons_per_animal_ytd_last_year:
+		animal_month_last_year.append({
+			'id':animal.id,
+			'name':animal.name,
+			'total_weight':animal.total_weight
+		})
 	pageSize = request.GET.get('pageSize')
 
 	if pageSize is None:
@@ -26,12 +77,12 @@ def ImportChartListViewSet(request):
 	paginator = Paginator(imports,pageSize)
 	page = request.GET.get('page')
 	data = paginator.get_page(page)
+	print(animal_month_month)
 	context = {
 				"data":data,
-				'total_weight_tons_per_animal_ytd':list(total_weight_tons_per_animal_ytd),
-				'total_weight_tons_per_animal_ytd_last_year':list(total_weight_tons_per_animal_ytd_last_year),
-				'total_weight_tons_per_animal_month':total_weight_tons_per_animal_month,
-				'total_weight_tons_per_animal_month_last_year':total_weight_tons_per_animal_month_last_year
+				'total_weight_tons_per_animal_month':animal_month_month,
+				'total_weight_tons_per_animal_ytd':animal_month,
+				'total_weight_tons_per_animal_ytd_last_year':animal_month_last_year,
 			}
 	return render(request,'importcharts/list.html',context)
 
@@ -81,12 +132,45 @@ def get_current_month_weight(request):
 	return JsonResponse(context)
 
 def get_current_ytd_weight(request):
-	imports = Import.objects.all()
-	total_weight_tons_per_animal_ytd = imports.filter(month__year=datetime.date.today().year).values('animal__name').annotate(total_weight=Sum('total_weight_tons')).order_by('animal__name')
-	total_weight_tons_per_animal_ytd_last_year = imports.filter(Q(month__year=datetime.date.today().year-1) &  Q(month__month__lte=datetime.date.today().month)).values('animal__name').annotate(total_weight=Sum('total_weight_tons')).order_by('animal__name')
+	total_weight_tons_per_animal_ytd =Animal.objects.raw('''SELECT Id ,NAME, SUM(total_weight) as total_weight FROM
+				(SELECT A.Id,A.name, SUM(coalesce(I.total_weight_tons,0)) total_weight
+				FROM public.quotation_animal A
+				LEFT JOIN public.importcharts_import I ON I.animal_id = A.Id
+				WHERE EXTRACT (YEAR FROM I.month) = EXTRACT(YEAR FROM now())
+				GROUP BY A.Id,A.name
+				UNION
+				SELECT A.Id,A.name, 0 FROM public.quotation_animal A) S
+				GROUP BY Id ,name
+				ORDER BY NAME''')
+
+	total_weight_tons_per_animal_ytd_last_year = Animal.objects.raw('''SELECT Id ,NAME, SUM(total_weight) as total_weight FROM
+				(SELECT A.Id,A.name, SUM(coalesce(I.total_weight_tons,0)) total_weight
+				FROM public.quotation_animal A
+				LEFT JOIN public.importcharts_import I ON I.animal_id = A.Id
+				WHERE EXTRACT (YEAR FROM I.month) = EXTRACT(YEAR FROM now()) - 1  AND
+					EXTRACT (MONTH FROM I.month) <= EXTRACT(MONTH FROM now())
+				GROUP BY A.Id,A.name
+				UNION
+				SELECT A.Id,A.name, 0 FROM public.quotation_animal A) S
+				GROUP BY Id ,name
+				ORDER BY NAME''')
+
+	animal_month = []
+	for animal in total_weight_tons_per_animal_ytd:
+		animal_month.append({
+			'name':animal.name,
+			'total_weight':animal.total_weight
+		})
+
+	animal_month_last_year = []
+	for animal in total_weight_tons_per_animal_ytd_last_year:
+		animal_month_last_year.append({
+			'name':animal.name,
+			'total_weight':animal.total_weight
+		})
 	context = {
-				'total_weight_tons_per_animal_ytd':list(total_weight_tons_per_animal_ytd),
-				'total_weight_tons_per_animal_ytd_last_year':list(total_weight_tons_per_animal_ytd_last_year)
+				'total_weight_tons_per_animal_ytd':animal_month,
+				'total_weight_tons_per_animal_ytd_last_year':animal_month_last_year
 			}
 	return JsonResponse(context)
 
@@ -194,3 +278,49 @@ def import_file(request):
 
 	return render(request, 'importcharts/list.html')
 
+def tooltip_view(request, animal_id):
+	isYtd = request.GET.get('isYtd')
+
+	if isYtd == 'true':
+		import_species_raw = Animal.objects.raw(f'''SELECT 1 as id, production_description, SUM(total_weight) as total_weight FROM
+					(SELECT I.Id,I.animal_id,I.production_description, SUM(coalesce(I.total_weight_tons,0)) total_weight
+					FROM public.quotation_animal A
+					LEFT JOIN public.importcharts_import I ON I.animal_id = A.Id
+					WHERE EXTRACT (YEAR FROM I.month) = EXTRACT(YEAR FROM now())
+					AND animal_id = {animal_id}
+					GROUP BY I.Id,I.animal_id,I.production_description
+					UNION
+					SELECT A.Id,A.animal_id,A.production_description, 0 FROM public.importcharts_import A
+					LEFT JOIN public.quotation_animal I ON A.animal_id = I.Id
+					WHERE animal_id = {animal_id}) S
+					GROUP BY production_description
+					ORDER BY production_description''')
+	else:
+		import_species_raw = Animal.objects.raw(f'''SELECT 1 as id, production_description, SUM(total_weight) as total_weight FROM
+					(SELECT I.Id,I.animal_id,I.production_description, SUM(coalesce(I.total_weight_tons,0)) total_weight
+					FROM public.quotation_animal A
+					LEFT JOIN public.importcharts_import I ON I.animal_id = A.Id
+					WHERE EXTRACT (YEAR FROM I.month) = EXTRACT(YEAR FROM now())
+					AND animal_id = {animal_id} AND
+					EXTRACT (MONTH FROM I.month) = EXTRACT(MONTH FROM now()) -1
+					GROUP BY I.Id,I.animal_id,I.production_description
+					UNION
+					SELECT A.Id,A.animal_id,A.production_description, 0 FROM public.importcharts_import A
+					LEFT JOIN public.quotation_animal I ON A.animal_id = I.Id
+					WHERE animal_id = {animal_id}) S
+					GROUP BY production_description
+					ORDER BY production_description''')
+
+
+	species = []
+	for specie in import_species_raw:
+		species.append({
+			'name':specie.production_description,
+			'total_weight':specie.total_weight
+		})
+	animal = Animal.objects.get(id=animal_id)
+	data = {
+		'title':animal.name,
+		'content':species
+	}
+	return JsonResponse(data)
