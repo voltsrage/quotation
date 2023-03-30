@@ -330,20 +330,25 @@ class Command(BaseCommand):
 		print('-----------------------------------------------------------------------')
 		print()
 
-		total_weight_tons_per_animal_month =Animal.objects.raw('''SELECT Id ,NAME, SUM(total_weight) as total_weight FROM
-				(SELECT A.Id,A.name, SUM(coalesce(I.total_weight_tons,0)) total_weight
-				FROM public.quotation_animal A
-				LEFT JOIN public.importcharts_import I ON I.animal_id = A.Id
-				WHERE EXTRACT (YEAR FROM I.month) = EXTRACT(YEAR FROM now())  AND
-					EXTRACT (MONTH FROM I.month) = EXTRACT(MONTH FROM now()) -1
-				GROUP BY A.Id,A.name
-				UNION
-				SELECT A.Id,A.name, 0 FROM public.quotation_animal A) S
-				GROUP BY Id ,name
-				ORDER BY NAME''')
-		print(total_weight_tons_per_animal_month)
-		for thing in total_weight_tons_per_animal_month:
-			print(f'{thing.name} - {thing.total_weight}')
+		# total_weight_tons_per_animal_month =Animal.objects.raw('''SELECT Id ,NAME, SUM(total_weight) as total_weight FROM
+		# 		(SELECT A.Id,A.name, SUM(coalesce(I.total_weight_tons,0)) total_weight
+		# 		FROM public.quotation_animal A
+		# 		LEFT JOIN public.importcharts_import I ON I.animal_id = A.Id
+		# 		WHERE EXTRACT (YEAR FROM I.month) = EXTRACT(YEAR FROM now())  AND
+		# 			EXTRACT (MONTH FROM I.month) = EXTRACT(MONTH FROM now()) -1
+		# 		GROUP BY A.Id,A.name
+		# 		UNION
+		# 		SELECT A.Id,A.name, 0 FROM public.quotation_animal A) S
+		# 		GROUP BY Id ,name
+		# 		ORDER BY NAME''')
+		# print(total_weight_tons_per_animal_month)
+		# for thing in total_weight_tons_per_animal_month:
+		# 	print(f'{thing.name} - {thing.total_weight}')
+
+		tests = Import.objects.filter(animal=1).values('month__year','country__name').annotate(total_weight=Sum('total_weight_tons')).order_by('month__year','country__name')[:300]
+
+		for test in tests:
+			print(test)
 
 		print()
 		print(connection.queries)

@@ -24,7 +24,6 @@ def dashboard(request):
 		'max':max_date['max_dt'].strftime('%Y-%m-%d')
 	}
 
-	print(date_range)
 
 	context = {
 		'suppliers':suppliers,

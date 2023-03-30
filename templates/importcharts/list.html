@@ -3,7 +3,7 @@
 {% load custom_filters %}
 {% block content %}
 <div class="row">
-	<h1 class="h3 mb-3"><strong>Imports</strong> Dashboard</h1>
+	<h1 class="h3 mb-3"><strong>Imports</strong> Management</h1>
 
 
 	<nav aria-label="Page navigation totals">
@@ -239,7 +239,8 @@
 						</div>
 					</div>
 			</div>
-
+			<form id="quotation-filter-form" method="get">
+				{% csrf_token %}
 				<div class="table-responsive">
 
 						<table class="table table-bordered table-striped">
@@ -254,7 +255,40 @@
 												<th>Weight (kg)</th>
 												<th>Total Cost</th>
 										</tr>
-
+										<tr>
+											<td></td>
+											<td>
+												<select name="commodityCode" id="commodityCode" class='form-control' multiple>
+													{% for commodityCode in form.commodity_code.field.queryset %}
+														<option value="{{ commodityCode  }}">{{ commodityCode }}</option>
+													{% endfor %}
+												</select>
+											</td>
+											<td>
+												<select name="month" id="month" class='form-control' multiple>
+													{% for month in form.month.field.queryset %}
+														<option value="{{ month|date:"Y-m-d"  }}">{{ month|date:"Y-m" }}</option>
+													{% endfor %}
+												</select>
+											</td>
+											<td>
+												<select name="description" id="description" class='form-control' multiple>
+													{% for description in form.production_description.field.queryset %}
+														<option value="{{ description  }}">{{ description }}</option>
+													{% endfor %}
+												</select>
+											</td>
+											<td>
+												<select name="country" id="country" class='form-control' multiple>
+													{% for country in form.country.field.queryset %}
+														<option value="{{ country.id  }}">{{ country.name }}</option>
+													{% endfor %}
+												</select>
+											</td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
 								</thead>
 								<tbody>
 									{% for obj in data %}
@@ -344,7 +378,7 @@
 						{% endif%}
 				</nav>
 				</div>
-
+			</form>
 	</div>
 </div>
 
@@ -378,16 +412,25 @@
 </div> {% endcomment %}
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 	function updateTablePaging(page){
 
 
 		var selectedPage = page
 		var selectPageSize = $('#pageSize').val();
+		var selectedCommodityCodes = $('#commodityCode').val();
+		var selectedMonths = $('#month').val();
+		var selectedDescriptions = $('#description').val();
+		var selectedCountries = $('#country').val();
 
 			var data = {
 				'page':selectedPage,
-				'pageSize':selectPageSize
+				'pageSize':selectPageSize,
+				'commodityCodes': selectedCommodityCodes,
+				'months': selectedMonths,
+				'descriptions': selectedDescriptions,
+				'countries': selectedCountries,
 
 			};
 
@@ -406,6 +449,12 @@
       });
 	}
 		$(document).ready(function() {
+
+			$('#commodityCode').select2();
+			$('#month').select2();
+			$('#description').select2();
+			$('#country').select2();
+
 				// when user clicks add more btn of sizeprices
 				var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
 				var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
@@ -478,6 +527,9 @@
 					},
 					title:popTitle
 				})
+
+
+
 
 				$('#tooltip-modal').on('hidden.bs.modal', function () {
 					$('#tooltip-content').empty()
@@ -567,8 +619,6 @@
 						},
 					});
 
-
-
 				})
 
 				$('#monthTotal').on('click',function(){
@@ -619,14 +669,19 @@
 				var updateTable = function(page){
 					var selectedPage = page
 					var selectPageSize = $('#pageSize').val();
+					var selectedCommodityCodes = $('#commodityCode').val();
+					var selectedMonths = $('#month').val();
+					var selectedDescriptions = $('#description').val();
+					var selectedCountries = $('#country').val();
 
 					var data = {
+						'commodityCodes': selectedCommodityCodes,
+						'months': selectedMonths,
+						'descriptions': selectedDescriptions,
+						'countries': selectedCountries,
 						'page':selectedPage,
 						'pageSize':selectPageSize
 					};
-
-
-
 					$.ajax({
 						url: "/importcharts/",
 						data: data,
@@ -634,6 +689,7 @@
 							// Replace the table with the updated one
 							 $("table tbody").replaceWith($(data).find("table tbody"));
 							$('.table-responsive nav').replaceWith($(data).find(".table-responsive nav"));
+							$('#pageSize').val({{pageSize}}).change();
 						},
 						error: function (xhr, status, error) {
 							console.error("AJAX error:", status, error);
@@ -641,6 +697,10 @@
 					});
 
 				}
+
+				$("#commodityCode, #month,  #description, #country ").on("change", function () {
+					updateTable(1)
+				});
 
 				$('#pageSize').change(function() {
 					updateTable($.trim($('.page-item.active').text()))
