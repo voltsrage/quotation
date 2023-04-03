@@ -89,5 +89,70 @@
 	</div>
 
 </div>
+{% comment %} <div class="card card-body">
+	<h1 class="h3 mb-3"><strong>Animal Breakdown by Year</strong></h1>
+	<div class="pt-3 pb-2 mb-3 border-bottom">
+		<form id="piechart-filters" class="row g-3">
+
+			{% csrf_token %}
+			<div class="col-md-6">
+				<label for="yearM" class="form-label">Countries:</label>
+				<select name="yearM" id="yearM" class='form-control' >
+					<option value="">All</option>
+					{% for yearM in years %}
+						<option value="{{ yearM }}">{{ yearM }}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</form>
+	</div>
+
+	<div id="treemap-chart" style="height: 600px;"></div>
+</div> {% endcomment %}
 </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+<script>
+
+$(document).ready(function() {
+/*
+	$('#yearM').select2();
+	var treemapChart = echarts.init(document.getElementById('treemap-chart'));
+
+
+	$("#yearM ").on("change", function () {
+		var selectedYear = $('#yearM').val();
+
+		var data = {
+			'year': selectedYear,
+		};
+
+		$.ajax({
+			url: "{% url 'importchart:treemapchart_data_echarts' %}",
+			data: data,
+			success: function (data) {
+				console.log(data.seriesData)
+
+				var option = {
+						tooltip: {
+								trigger: 'item',
+								formatter: "{b}: ${c}"
+						},
+						series:  data.seriesData[0]
+				};
+				treemapChart.setOption(option);
+			},
+			error: function (xhr, status, error) {
+				console.error("AJAX error:", status, error);
+			},
+		});
+
+
+	});*/
+
+})
+</script>
 {% endblock %}

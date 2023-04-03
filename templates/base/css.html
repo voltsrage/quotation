@@ -103,7 +103,33 @@
 				transition: color 0.3s ease;
 		}
 
+		.select2-container .select2-selection--multiple {
+			height: auto !important;
+	}
 
+	.select2-container--default .select2-selection--multiple .select2-selection__choice {
+			background-color: #007bff;
+			color: #fff;
+			border-color: #007bff;
+	}
+
+	.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+			color: #fff;
+	}
+
+	.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+			color: #fff;
+	}
+
+	.select2-container--default .select2-results__option[aria-selected=true] {
+			background-color: #007bff;
+			color: #fff;
+	}
+
+	.select2-container--default .select2-results__option--highlighted[aria-selected] {
+			background-color: #007bff;
+			color: #fff;
+	}
 
     {% comment %} .nav-scroller {
         position: relative;

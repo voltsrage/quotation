@@ -348,8 +348,9 @@ def tooltip_view(request, animal_id):
 	return JsonResponse(data)
 
 def importsAnimalSelect(request):
+	years = Import.objects.order_by('month__year').values_list('month__year', flat=True).distinct()
 	context = {
-
+		'years':years
 	}
 	return render(request,'importcharts/animalselect.html',context)
 
@@ -357,6 +358,14 @@ def importsDashboard(request,animal_id):
 	descriptions = Import.objects.filter(animal=animal_id).order_by('production_description').values_list('production_description', flat=True).distinct()
 	countries = Import.objects.filter(animal=animal_id).order_by('country_name').values_list('country','country_name').distinct()
 	years = Import.objects.order_by('month__year').values_list('month__year', flat=True).distinct()
+	months = Import.objects.filter(animal=animal_id).order_by('month__year','month__month').values_list('month__year' ,'month__month').distinct()
+
+	month_list = []
+	for i,month in enumerate(months):
+		if month[1] < 10:
+			month_list.append(f'{month[0]}-0{month[1]}')
+		else:
+			month_list.append(f'{month[0]}-{month[1]}')
 
 	min_date =  Import.objects.aggregate(min_dt=Min('month'))
 	max_date =  Import.objects.aggregate(max_dt=Max('month'))
@@ -370,6 +379,7 @@ def importsDashboard(request,animal_id):
 		'descriptions':descriptions,
 		'countries':countries,
 		'years':years,
+		'months':month_list,
 		'date_range':date_range,
 		'animal_id':animal_id
 	}
@@ -377,13 +387,16 @@ def importsDashboard(request,animal_id):
 
 def barchart_data(request):
 	selected_countries = request.GET.getlist('countries[]')
-	selected_years = request.GET.getlist('years[]')
+	selected_months = request.GET.getlist('months[]')
 	selected_descriptions = request.GET.getlist('descriptions[]')
-
+	print(selected_months)
 	data = {
-				'labels': selected_years,
+				'labels': selected_months,
 				'datasets': []
 		}
+
+	yAxisData = []
+	legendData = []
 
 	dataset_borderColors = ['rgba(0,110,185, 1)',
 				'rgba(242,108,82, 1)',
@@ -401,176 +414,102 @@ def barchart_data(request):
 						'borderColor': dataset_borderColors[i % len(dataset_borderColors)],
 						'borderWidth': 1
 				}
-				for year in selected_years:
-						total_weight = Import.objects.filter(country=country, month__year=year, production_description__in=selected_descriptions).aggregate(total_weight=Sum('total_weight_tons'))['total_weight']
+				for month in selected_months:
+						month = month.split('-')
+						print(month)
+						total_weight = Import.objects.filter(country=country, month__year=month[0],month__month=month[1], production_description__in=selected_descriptions).aggregate(total_weight=Sum('total_weight_tons'))['total_weight']
 
 						dataset['data'].append(total_weight if total_weight else 0)
 				data['datasets'].append(dataset)
 
 	return JsonResponse(data)
 
-def linechart_data(request):
-	selected_countries = request.GET.getlist('countries[]')
-	selected_descriptions = request.GET.getlist('descriptions[]')
-	startDate = request.GET.get('startDate', '')
-	endDate = request.GET.get('endDate', '')
+def treemapchart_data_echarts(request):
 
-
-	queryset = Import.objects.all()
-
-	if startDate:
-			startDate = datetime.datetime.strptime(startDate, '%d/%m/%Y').date()
-			queryset = queryset.filter(month__gte=startDate)
-	if endDate:
-			endDate = datetime.datetime.strptime(endDate, '%d/%m/%Y').date()
-			queryset = queryset.filter(month__lte=endDate)
-
-	if len(selected_countries) > 0:
-			queryset = queryset.filter(Q(country__in=selected_countries))
-
-
-	queryset = queryset.filter(Q(production_description__in=selected_descriptions))
-
-	weights = queryset
-	datasets = []
-	dataset_borderColors = ['rgba(0,110,185, 1)',
-			'rgba(242,108,82, 1)',
-			'rgba(0,48,70, 1)',
-			'rgba(0, 125, 137, 1)',
-			'rgba(255,205,52, 1)',
-			'rgba(63,191,176, 1)',
-			'rgba(162,38,21, 1)',
-			'rgba(34,192,241, 1)',
-			'rgba(171,127,25, 1)',
-			'rgba(236,233,36, 1)',
-			'rgba(115,184,101, 1)',
-			'rgba(95,100,106, 1)',]
-
-	dataset_backgroundColors = ['rgba(0,110,185, 0.1)',
-			'rgba(242,108,82, 0.1)',
-			'rgba(0,48,70, 0.1)',
-			'rgba(0, 125, 137, 0.1)',
-			'rgba(255,205,52, 0.1)',
-			'rgba(63,191,176, 0.1)',
-			'rgba(162,38,21, 0.1)',
-			'rgba(34,192,241, 0.1)',
-			'rgba(171,127,25, 0.1)',
-			'rgba(236,233,36, 0.1)',
-			'rgba(115,184,101, 0.1)',
-			'rgba(95,100,106, 0.1)']
-
-	months_in_range = Import.objects.filter(Q(month__gte=startDate) & Q(month__lte=endDate)).order_by('month__year','month__month').distinct('month__year','month__month')
-
-
-	for i,country in enumerate(selected_countries):
-			weights_country = weights.filter(country=country)
-			data = []
-			labels = []
-			for month in months_in_range:
-				weights_month = weights_country.filter(month=month.month)
-				labels.append(f'{month.month.strftime("%Y-%m")}')
-				if weights_month.exists():
-					total_weight = weights_month.aggregate(total_weight=Sum('total_weight_tons'))['total_weight']
-					data.append(round(total_weight, 2))
-				else:
-					data.append(0)
-
-			dataset = {
-						'label': Country.objects.get(pk=country).name,
-						'data': data,
-						'borderColor': dataset_borderColors[i],
-						'backgroundColor': dataset_backgroundColors[i]
-				}
-			datasets.append(dataset)
-	data = {
-				'labels': labels,
-				'datasets': datasets
-		}
-	options = {
-			'scales': {
-					'yAxes': [{
-							'ticks': {
-									'beginAtZero': True
-							}
-					}]
-			}
-	}
-
-	return JsonResponse({
-			'data': data, 'options': options
-		})
-
-def piechart_data(request):
 	selected_year = request.GET.get('year')
-	selected_descriptions = request.GET.getlist('descriptions[]')
-	animal_id = request.GET.get('animal_id')
-	queryset = Import.objects.filter(animal=animal_id)
+
+	import_data = Import.objects.all().values('animal__name','production_description','total_weight_tons')
 
 	if selected_year:
-		queryset = queryset.filter(month__year=selected_year)
-	else:
-		queryset = queryset.filter(month__year=queryset.aggregate(max_year=Max('month__year'))['max_year'])
+		import_data = import_data.filter(month__year=selected_year)
 
-	if len(selected_descriptions) > 0:
-		queryset = queryset.filter(Q(production_description__in=selected_descriptions))
+	data = {}
+	for i,item in enumerate(import_data):
+		animal__name = item['animal__name']
+		description = item['production_description']
 
-	year_total_weight_years =  queryset.values('month__year').annotate(total_weight=Sum('total_weight_tons'))
-	year_total_weight = year_total_weight_years.get(month__year=selected_year)['total_weight']
-	queryset = queryset.values('month__year','country__name').annotate(total_weight=Sum('total_weight_tons')).order_by('month__year','country__name')
+		weight = item['total_weight_tons']
+		if animal__name not in data:
+			data[animal__name] = {}
 
-	data = []
-	labels = []
-	for item in queryset:
-		percent = (item['total_weight'] * 100) / year_total_weight
-		data.append(round(percent,2))
-		labels.append(item['country__name'])
+		if description.strip() not in data[animal__name]:
+			data[animal__name][description.strip()] = 0
 
-	datasets = []
-	dataset = {
-		'label':str(selected_year),
-		'data':data,
-    'hoverOffset': 4,
-    'backgroundColor':[
-    '#4E79A7',
-    '#F28E2B',
-    '#E15759',
-    '#76B7B2',
-    '#59A14F',
-    '#EDC949',
-    '#AF7AA1',
-    '#FF9DA7',
-    '#9C755F',
-    '#BAB0AC',
-    '#7F7F7F',
-    '#CED1D6',
-    '#B07AA1',
-    '#FFB5B8',
-    '#8C613C',
-    '#BDC9E1',
-    '#FFA384',
-    '#9CB3D5',
-    '#BEBBD8',
-    '#D6B4A7',
-    '#9C9E97',
-    '#FDCDAC',
-    '#B3E2CD',
-    '#C6DBEF',
-    '#FDB462',
-    '#C2A5CF',
-    '#FFCC99',
-    '#8DD3C7',
-    '#FFFFB3',
-    '#80B1D3'
-]
-	}
-	datasets.append(dataset)
+		data[animal__name][description.strip()] += weight
 
+	seriesData = []
+	dataItem = []
+	count = 0
+	for animal__name, description_data in data.items():
+		dataItem.append({
+			'name':animal__name,
+			'children':[],
+			'value':0
+		})
+		for description, weight in description_data.items():
+			dataItem[count]['children'].append({
+				'name':description,
+				'value':weight
+			})
+			dataItem[count]['value'] += weight
+		count = count + 1
+	seriesData.append({
+		'type':'treemap',
+		'data':dataItem
+	})
+	context = {
+        'seriesData': seriesData,
+    }
+
+
+	return JsonResponse(context)
+
+def barchart_data_echarts(request):
+	context = {}
+	selected_countries = request.GET.getlist('countries[]')
+	selected_months = request.GET.getlist('months[]')
+	selected_descriptions = request.GET.getlist('descriptions[]')
+	print(selected_months)
+	context['seriesData'] = []
 	data = {
-				'labels': labels,
-				'datasets': datasets
+				'labels': selected_months,
+				'datasets': []
 		}
 
-	return JsonResponse({'data':data})
+	yAxisData = []
+	legendData = []
+
+	for i, country in enumerate(selected_countries):
+				country_name = Country.objects.get(pk=country).name
+				legendData.append(country_name)
+				seriesData = []
+				for month in selected_months:
+						if month not in yAxisData:
+							yAxisData.append(month)
+						month = month.split('-')
+						total_weight = Import.objects.filter(country=country, month__year=month[0],month__month=month[1], production_description__in=selected_descriptions).aggregate(total_weight=Sum('total_weight_tons'))['total_weight']
+
+
+						seriesData.append(total_weight if total_weight else 0)
+				context['seriesData'].append({
+										'name': country_name,
+										'type': 'bar',
+										'data': seriesData
+								})
+	context['yAxisData'] = yAxisData
+	context['legendData'] = legendData
+
+	return JsonResponse(context)
 
 
 def piechart_data_echart(request):
@@ -607,3 +546,143 @@ def piechart_data_echart(request):
 		}
 
 	return JsonResponse({'data':data})
+
+def linechart_data_echarts(request):
+	context = {}
+	selected_countries = request.GET.getlist('countries[]')
+	selected_descriptions = request.GET.getlist('descriptions[]')
+	startDate = request.GET.get('startDate', '')
+	endDate = request.GET.get('endDate', '')
+
+
+	queryset = Import.objects.all()
+
+	if startDate:
+			startDate = f'{startDate}-01'
+			startDate = datetime.datetime.strptime(startDate, '%Y-%m-%d').date()
+			queryset = queryset.filter(month__gte=startDate)
+	if endDate:
+			endDate = f'{endDate}-01'
+			endDate = datetime.datetime.strptime(endDate, '%Y-%m-%d').date()
+			queryset = queryset.filter(month__lte=endDate)
+
+	if len(selected_countries) > 0:
+			queryset = queryset.filter(Q(country__in=selected_countries))
+
+
+	queryset = queryset.filter(Q(production_description__in=selected_descriptions))
+
+	weights = queryset
+	datasets = []
+	series = []
+
+	# labelOption = {
+	# 						'show': True,
+	# 						'rotate':45,
+	# 						'position':'top',
+	# 						'fontWeight': 'bold',
+	# 						'formatter': '{c}|formatvalue'
+	# 					};
+
+	months_in_range = Import.objects.filter(Q(month__gte=startDate) & Q(month__lte=endDate)).order_by('month__year','month__month').distinct('month__year','month__month')
+
+	xAxisData = []
+	legendData = []
+	context['seriesData'] = []
+	if len(selected_countries) == 0:
+		seriesData = []
+		context['xAxisData'] = []
+		context['legendData'] = []
+		context['descriptions'] = selected_descriptions
+		context['countries'] = selected_countries
+
+		context['seriesData'].append({
+										'name': '',
+										'type': 'line',
+										'data': seriesData
+								})
+		return JsonResponse(context)
+
+
+	for i,country in enumerate(selected_countries):
+			country_name = Country.objects.get(pk=country).name
+			weights_country = weights.filter(country=country)
+
+			legendData.append(country_name)
+			seriesData = []
+			for month in months_in_range:
+				weights_month = weights_country.filter(month=month.month)
+				monthToEnter = f'{month.month.strftime("%Y-%m")}'
+				if monthToEnter not in xAxisData:
+					xAxisData.append(f'{month.month.strftime("%Y-%m")}')
+				if weights_month.exists():
+					total_weight = weights_month.aggregate(total_weight=Sum('total_weight_tons'))['total_weight']
+					seriesData.append(round(total_weight, 2))
+				else:
+					seriesData.append(0)
+
+			context['seriesData'].append({
+										'name': country_name,
+										'type': 'line',
+										'areaStyle': {},
+										 'emphasis': {
+											'focus': 'series'
+										},
+										'data': seriesData
+								})
+	context['xAxisData'] = xAxisData
+	context['legendData'] = legendData
+	context['descriptions'] = selected_descriptions
+	context['countries'] = selected_countries
+
+	return JsonResponse(context)
+	# legends = []
+	# main_labels = []
+	# for i,country in enumerate(selected_countries):
+	# 		country_name = Country.objects.get(pk=country).name
+	# 		legends.append(country_name)
+	# 		weights_country = weights.filter(country=country)
+	# 		data = []
+	# 		labels = []
+	# 		for month in months_in_range:
+	# 			weights_month = weights_country.filter(month=month.month)
+	# 			labels.append(f'{month.month.strftime("%Y-%m")}')
+	# 			if weights_month.exists():
+	# 				total_weight = weights_month.aggregate(total_weight=Sum('total_weight_tons'))['total_weight']
+	# 				data.append(round(total_weight, 2))
+	# 			else:
+	# 				data.append(0)
+
+	# 		dataset = {
+	# 					'label': country_name,
+	# 					'data': data,
+	# 					'borderColor': dataset_borderColors[i],
+	# 					'backgroundColor': dataset_backgroundColors[i]
+	# 			}
+	# 		main_labels = labels
+	# 		serie = {
+	# 			'name':Country.objects.get(pk=country).name,
+	# 			'type':'line',
+	# 			'stack':'Total',
+	# 			'data':data
+	# 		}
+	# 		series.append(serie)
+	# 		datasets.append(dataset)
+	# data = {
+	# 		'legends':legends,
+	# 			'labels': main_labels,
+	# 			'series': series
+	# 	}
+	# options = {
+	# 		'scales': {
+	# 				'yAxes': [{
+	# 						'ticks': {
+	# 								'beginAtZero': True
+	# 						}
+	# 				}]
+	# 		}
+	# }
+
+	# return JsonResponse({
+	# 		'data': data, 'options': options
+	# 	})

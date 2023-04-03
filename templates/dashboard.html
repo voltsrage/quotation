@@ -1,5 +1,7 @@
 {% extends "base.html" %} {% load static %} {% block content %}
 
+<div class="card card-body">
+		<h1 class="h3 mb-3"><strong>Countries Weight</strong></h1>
 <div class="pt-3 pb-2 mb-3 border-bottom">
 
 	<form id="filters" class="row g-3">
@@ -72,13 +74,16 @@
   </form>
 </div>
 
-<canvas id="chart" height='100px'></canvas>
+<canvas id="chart" height='400px'></canvas>
 
 <div class='my-4'>
 	<label for="date-slider">Select Date Range:</label>
 	<input type="text" id="date-slider" name="date-range" />
 </div>
+</div>
 
+<div class="card card-body">
+	<h1 class="h3 mb-3"><strong>Countries Weight</strong></h1>
 <div class="pt-3 pb-2 mb-3 border-bottom border-top">
 
 	<form id="filter-form" class="row g-3">
@@ -182,7 +187,8 @@
   </form>
 </div>
 
-<canvas id="chart2" height='100px'></canvas>
+<canvas id="chart2" height='400px'></canvas>
+</div>
 
 <script
   src="https://code.jquery.com/jquery-3.6.4.min.js"

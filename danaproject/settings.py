@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 		'rest_framework.authtoken',
 		'user',
 		'quotation',
+    'active_link',
 		'crispy_forms',
 		'crispy_bootstrap5',
     'widget_tweaks',
