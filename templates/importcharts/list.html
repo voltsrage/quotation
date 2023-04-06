@@ -17,7 +17,7 @@
 				<div class="w-100">
 						<div class="row">
 
-								<div class="col-sm-6  col-lg-2">
+								<div class="col-sm-6  col-lg-4 col-xl-2">
 										<div class="card">
 												<div class="card-body">
 														<div class="row">
@@ -47,7 +47,7 @@
 										</div>
 								</div>
 
-								<div class="col-sm-6  col-lg-2">
+								<div class="col-sm-6  col-lg-4 col-xl-2">
 									<div class="card">
 											<div class="card-body">
 													<div class="row">
@@ -77,7 +77,7 @@
 									</div>
 							</div>
 
-							<div class="col-sm-6  col-lg-2">
+							<div class="col-sm-6  col-lg-4 col-xl-2">
 								<div class="card">
 										<div class="card-body">
 												<div class="row">
@@ -107,7 +107,7 @@
 								</div>
 						</div>
 
-								<div class="col-sm-6  col-lg-2">
+								<div class="col-sm-6  col-lg-4 col-xl-2">
 										<div class="card">
 												<div class="card-body">
 														<div class="row">
@@ -137,7 +137,7 @@
 										</div>
 								</div>
 
-								<div class="col-sm-6  col-lg-2">
+								<div class="col-sm-6  col-lg-4 col-xl-2">
 									<div class="card">
 											<div class="card-body">
 													<div class="row">
@@ -167,7 +167,7 @@
 									</div>
 							</div>
 
-							<div class="col-sm-6  col-lg-2">
+							<div class="col-sm-6  col-lg-4 col-xl-2">
 								<div class="card">
 										<div class="card-body">
 												<div class="row">
@@ -248,8 +248,8 @@
 										<tr>
 												<th>#</th>
 												<th>Commodity Code</th>
-												<th>Month</th>
-												<th>Description</th>
+												<th style="width:8%">Month</th>
+												<th style="width:25%">Description</th>
 												<th>Country</th>
 												<th>Price/kg (USD)</th>
 												<th>Weight (kg)</th>
@@ -265,9 +265,16 @@
 												</select>
 											</td>
 											<td>
-												<select name="month" id="month" class='form-control' multiple>
-													{% for month in form.month.field.queryset %}
-														<option value="{{ month|date:"Y-m-d"  }}">{{ month|date:"Y-m" }}</option>
+												<select name="start_month" id="start_month" class='form-control' >
+													<option value="">All</option>
+													{% for start_month in form.start_month.field.queryset %}
+														<option value="{{ start_month|date:"Y-m-d"  }}">{{ start_month|date:"Y-m" }}</option>
+													{% endfor %}
+												</select>
+												<select name="end_month" id="end_month" class='form-control' >
+													<option value="">All</option>
+													{% for end_month in form.end_month.field.queryset %}
+														<option value="{{ end_month|date:"Y-m-d"  }}">{{ end_month|date:"Y-m" }}</option>
 													{% endfor %}
 												</select>
 											</td>
@@ -307,6 +314,16 @@
 											{% endfor %}
 								</tbody>
 						</table>
+						<div >
+							<div class='my-4 ' style='margin: auto;width:98%;'>
+								<label for="price-slider">Select Price Range (USD$):</label>
+								<input type="text" id="price-slider" name="price-range" />
+							</div>
+							<div class='my-4' style='margin: auto;width:98%;'>
+								<label for="weight-slider">Select Weight Range (tons):</label>
+								<input type="text" id="weight-slider" name="weight-range" />
+							</div>
+						</div>
 
 						<!-- Pagination -->
 						{% if data.has_other_pages %}
@@ -413,25 +430,39 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
 <script>
+	var priceRange = $('#price-slider');
+	var weightRange = $('#weight-slider');
 	function updateTablePaging(page){
-
-
+		var weightRangeVar = weightRange.data("ionRangeSlider").result;
+		var priceRangeVar = priceRange.data("ionRangeSlider").result;
 		var selectedPage = page
 		var selectPageSize = $('#pageSize').val();
 		var selectedCommodityCodes = $('#commodityCode').val();
-		var selectedMonths = $('#month').val();
+		var selectedStartMonth = $('#start_month').val();
+		var selectedEndMonth = $('#end_month').val();
 		var selectedDescriptions = $('#description').val();
 		var selectedCountries = $('#country').val();
+
+		if(new Date(selectedStartMonth).getTime() > new Date(selectedEndMonth).getTime())
+		{
+			alert('Start date cannot be greater than enddate')
+			return
+		}
 
 			var data = {
 				'page':selectedPage,
 				'pageSize':selectPageSize,
 				'commodityCodes': selectedCommodityCodes,
-				'months': selectedMonths,
+				'startMonth': selectedStartMonth,
+				'endMonth': selectedEndMonth,
 				'descriptions': selectedDescriptions,
 				'countries': selectedCountries,
-
+				'start_weight':weightRangeVar.from,
+				'end_weight':weightRangeVar.to,
+				'start_price':priceRangeVar.from,
+				'end_price':priceRangeVar.to,
 			};
 
 			$.ajax({
@@ -451,7 +482,6 @@
 		$(document).ready(function() {
 
 			$('#commodityCode').select2();
-			$('#month').select2();
 			$('#description').select2();
 			$('#country').select2();
 
@@ -461,32 +491,124 @@
 					return new bootstrap.Popover(popoverTriggerEl)
 				})
 
-				/*
-				$('.productIcon').each(function() {
-					var animal_id = $(this).data('id');
+				$("#price-slider").ionRangeSlider({
+					skin: "big",
+					type: "double",
+					grid: true,
+					min: `{{ price_weight_limits.min_price }}`,
+					max: `{{ price_weight_limits.max_price }}`,
+					from: `{{ price_weight_limits.min_price }}`,
+					to: `{{ price_weight_limits.max_price }}`,
+					step: 0.1,
+					prettify: function(num) {
 
-					$(this).popover({
-						html:true,
-						content: function(){
-							var result = '';
-							$.ajax({
-								url: '/importcharts/tooltip/' + animal_id,
-								dataType: 'json',
-								success: function(data) {
-									console.log('data',data)
-									result = '<ul>';
-                    for (var i = 0; i < data.content.length; i++) {
-                        result += '<li>' + data.content[i].name + '</li>';
-                    }
-                    result += '</ul>';
-								}
-							});
-							console.log('result',result)
-							return result;
+					 return 'USD$ '+(num*1.00).toFixed(2);
+					},
+
+					onFinish : function(data) {
+						var weightRangeVar = weightRange.data("ionRangeSlider").result;
+						var selectedPage = $.trim($('.page-item.active').text())
+						var selectPageSize = $('#pageSize').val();
+						var selectedCommodityCodes = $('#commodityCode').val();
+						var selectedStartMonth = $('#start_month').val();
+						var selectedEndMonth = $('#end_month').val();
+						var selectedDescriptions = $('#description').val();
+						var selectedCountries = $('#country').val();
+
+						if(new Date(selectedStartMonth).getTime() > new Date(selectedEndMonth).getTime())
+						{
+							alert('Start date cannot be greater than enddate')
+							return
 						}
-					})
 
-				})*/
+							var data = {
+								'page':selectedPage,
+								'pageSize':selectPageSize,
+								'commodityCodes': selectedCommodityCodes,
+								'startMonth': selectedStartMonth,
+								'endMonth': selectedEndMonth,
+								'descriptions': selectedDescriptions,
+								'countries': selectedCountries,
+								'start_price':data.from,
+								'end_price':data.to,
+								'start_weight':weightRangeVar.from,
+								'end_weight':weightRangeVar.to,
+							};
+							$.ajax({
+								url: "/importcharts/",
+								data: data,
+								success: function (data) {
+									// Replace the table with the updated one
+									 $("table tbody").replaceWith($(data).find("table tbody"));
+									$('.table-responsive nav').replaceWith($(data).find(".table-responsive nav"));
+
+								},
+								error: function (xhr, status, error) {
+									console.error("AJAX error:", status, error);
+								},
+							});
+					}
+				});
+
+				$("#weight-slider").ionRangeSlider({
+					skin: "big",
+					type: "double",
+					grid: true,
+					min: `{{ price_weight_limits.min_weight }}`,
+					max: `{{ price_weight_limits.max_weight }}`,
+					from: `{{ price_weight_limits.min_weight }}`,
+					to: `{{ price_weight_limits.max_weight }}`,
+					step: 10,
+					prettify: function(num) {
+
+					 return num + 'tons';
+					},
+
+					onFinish : function(data) {
+						var priceRangeVar = priceRange.data("ionRangeSlider").result;
+						var selectedPage = $.trim($('.page-item.active').text())
+						var selectPageSize = $('#pageSize').val();
+						var selectedCommodityCodes = $('#commodityCode').val();
+						var selectedStartMonth = $('#start_month').val();
+						var selectedEndMonth = $('#end_month').val();
+						var selectedDescriptions = $('#description').val();
+						var selectedCountries = $('#country').val();
+
+						if(new Date(selectedStartMonth).getTime() > new Date(selectedEndMonth).getTime())
+						{
+							alert('Start date cannot be greater than enddate')
+							return
+						}
+
+							var data = {
+								'page':selectedPage,
+								'pageSize':selectPageSize,
+								'commodityCodes': selectedCommodityCodes,
+								'startMonth': selectedStartMonth,
+								'endMonth': selectedEndMonth,
+								'descriptions': selectedDescriptions,
+								'countries': selectedCountries,
+								'start_price':priceRangeVar.from,
+								'end_price':priceRangeVar.to,
+								'start_weight':data.from,
+								'end_weight':data.to,
+							};
+							$.ajax({
+								url: "/importcharts/",
+								data: data,
+								success: function (data) {
+									// Replace the table with the updated one
+									 $("table tbody").replaceWith($(data).find("table tbody"));
+									$('.table-responsive nav').replaceWith($(data).find(".table-responsive nav"));
+
+								},
+								error: function (xhr, status, error) {
+									console.error("AJAX error:", status, error);
+								},
+							});
+					}
+				});
+
 				var popTitle = '';
 				$('.productIcon').popover({
 					html:true,
@@ -496,7 +618,6 @@
 						var result = '';
 						var weight = $(this).data('weight')
 						var weightMth = $(this).data('weightmth')
-						console.log(weightMth)
 						var isYtd = $('#ytdTotal').parent().hasClass('active')
 					 $.ajax({
 						async: false,
@@ -670,17 +791,34 @@
 					var selectedPage = page
 					var selectPageSize = $('#pageSize').val();
 					var selectedCommodityCodes = $('#commodityCode').val();
-					var selectedMonths = $('#month').val();
+					var selectedStartMonth = $('#start_month').val();
+					var selectedEndMonth = $('#end_month').val();
 					var selectedDescriptions = $('#description').val();
 					var selectedCountries = $('#country').val();
+					var weightRangeVar = weightRange.data("ionRangeSlider").result;
+					var priceRangeVar = priceRange.data("ionRangeSlider").result;
+
+					if(selectedEndMonth != '' && selectedEndMonth != null && selectedStartMonth != '' && selectedStartMonth != null){
+						if(new Date(selectedStartMonth).getTime() > new Date(selectedEndMonth).getTime())
+						{
+							alert('Start date cannot be greater than enddate')
+							return
+						}
+					}
+
 
 					var data = {
 						'commodityCodes': selectedCommodityCodes,
-						'months': selectedMonths,
+						'startMonth': selectedStartMonth,
+						'endMonth': selectedEndMonth,
 						'descriptions': selectedDescriptions,
 						'countries': selectedCountries,
 						'page':selectedPage,
-						'pageSize':selectPageSize
+						'pageSize':selectPageSize,
+						'start_weight':weightRangeVar.from,
+						'end_weight':weightRangeVar.to,
+						'start_price':priceRangeVar.from,
+						'end_price':priceRangeVar.to,
 					};
 					$.ajax({
 						url: "/importcharts/",
@@ -689,7 +827,7 @@
 							// Replace the table with the updated one
 							 $("table tbody").replaceWith($(data).find("table tbody"));
 							$('.table-responsive nav').replaceWith($(data).find(".table-responsive nav"));
-							$('#pageSize').val({{pageSize}}).change();
+							//$('#pageSize').val({{pageSize}}).change();
 						},
 						error: function (xhr, status, error) {
 							console.error("AJAX error:", status, error);
@@ -698,7 +836,7 @@
 
 				}
 
-				$("#commodityCode, #month,  #description, #country ").on("change", function () {
+				$("#commodityCode, #start_month, #end_month,  #description, #country ").on("change", function () {
 					updateTable(1)
 				});
 

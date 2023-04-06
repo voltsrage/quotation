@@ -1,5 +1,6 @@
 import pandas as pd
 import datetime
+from decimal import Decimal
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
@@ -9,23 +10,61 @@ from .forms import ImportFilterForm
 from django.db.models import Avg,Max,Min,Sum,Count, Q,F,Case, Value, When,ExpressionWrapper, DecimalField
 from django.db import IntegrityError
 from quotation.models import Country,Animal
+from django.contrib.auth.decorators import login_required
 
+@login_required(login_url='user:loginUser')
 # Create your views here.
 def ImportChartListViewSet(request):
 	form = ImportFilterForm(request.GET)
 
 	selected_commodityCodes  = request.GET.getlist('commodityCodes[]')
-	selected_months  = request.GET.getlist('months[]')
+	selected_startMonth  = request.GET.get('startMonth')
+	selected_endMonth  = request.GET.get('endMonth')
+	selected_start_weight  = request.GET.get('start_weight')
+	selected_end_weight  = request.GET.get('end_weight')
+	selected_start_price  = request.GET.get('start_price')
+	selected_end_price = request.GET.get('end_price')
 	selected_descriptions  = request.GET.getlist('descriptions[]')
 	selected_countries  = request.GET.getlist('countries[]')
 
 	imports = Import.objects.all()
 
+	price_weight_limits = {
+		'min_price':Decimal(0.00),
+		'max_price':Decimal(0.00),
+		'min_weight':Decimal(0),
+		'max_weight':Decimal(0)
+	}
+
+	#max_price = imports.aggregate(max_price=Max('price_per_kg'))['max_price']
+	max_price = Decimal(100.00)
+	max_weight = imports.aggregate(max_weight=Max('total_weight_tons'))['max_weight']
+	min_weight = imports.aggregate(min_weight=Min('total_weight_tons'))['min_weight']
+
+	price_weight_limits['min_weight'] = min_weight
+	price_weight_limits['max_weight'] = max_weight
+	price_weight_limits['max_price'] = max_price
+
 	if len(selected_commodityCodes) > 0:
 		imports = imports.filter(Q(commodity_code__in=selected_commodityCodes))
 
-	if len(selected_months) > 0:
-		imports = imports.filter(Q(month__in=selected_months))
+	if selected_startMonth:
+		imports = imports.filter(Q(month__gte=selected_startMonth))
+
+	if selected_endMonth:
+		imports = imports.filter(Q(month__lte=selected_endMonth))
+
+	if selected_start_price:
+		imports = imports.filter(Q(price_per_kg__gte=selected_start_price))
+
+	if selected_end_price:
+		imports = imports.filter(Q(price_per_kg__lte=selected_end_price))
+
+	if selected_start_weight:
+		imports = imports.filter(Q(total_weight_tons__gte=selected_start_weight))
+
+	if selected_end_weight:
+		imports = imports.filter(Q(total_weight_tons__lte=selected_end_weight))
 
 	if len(selected_descriptions) > 0:
 		imports = imports.filter(Q(production_description__in=selected_descriptions))
@@ -104,10 +143,12 @@ def ImportChartListViewSet(request):
 				'total_weight_tons_per_animal_month':animal_month_month,
 				'total_weight_tons_per_animal_ytd':animal_month,
 				'total_weight_tons_per_animal_ytd_last_year':animal_month_last_year,
+				'price_weight_limits':price_weight_limits,
 				'form':form
 			}
 	return render(request,'importcharts/list.html',context)
 
+@login_required(login_url='user:loginUser')
 def get_current_month_weight(request):
 	total_weight_tons_per_animal_month =Animal.objects.raw('''SELECT Id ,NAME, SUM(total_weight) as total_weight FROM
 				(SELECT A.Id,A.name, SUM(coalesce(I.total_weight_tons,0)) total_weight
@@ -153,6 +194,7 @@ def get_current_month_weight(request):
 			}
 	return JsonResponse(context)
 
+@login_required(login_url='user:loginUser')
 def get_current_ytd_weight(request):
 	total_weight_tons_per_animal_ytd =Animal.objects.raw('''SELECT Id ,NAME, SUM(total_weight) as total_weight FROM
 				(SELECT A.Id,A.name, SUM(coalesce(I.total_weight_tons,0)) total_weight
@@ -196,6 +238,7 @@ def get_current_ytd_weight(request):
 			}
 	return JsonResponse(context)
 
+@login_required(login_url='user:loginUser')
 def import_file(request):
 	data = Import.objects.all()
 	if request.method == 'POST' and request.FILES['file']:
@@ -300,6 +343,7 @@ def import_file(request):
 
 	return render(request, 'importcharts/list.html')
 
+@login_required(login_url='user:loginUser')
 def tooltip_view(request, animal_id):
 	isYtd = request.GET.get('isYtd')
 
@@ -347,6 +391,7 @@ def tooltip_view(request, animal_id):
 	}
 	return JsonResponse(data)
 
+@login_required(login_url='user:loginUser')
 def importsAnimalSelect(request):
 	years = Import.objects.order_by('month__year').values_list('month__year', flat=True).distinct()
 	context = {
@@ -354,6 +399,7 @@ def importsAnimalSelect(request):
 	}
 	return render(request,'importcharts/animalselect.html',context)
 
+@login_required(login_url='user:loginUser')
 def importsDashboard(request,animal_id):
 	descriptions = Import.objects.filter(animal=animal_id).order_by('production_description').values_list('production_description', flat=True).distinct()
 	countries = Import.objects.filter(animal=animal_id).order_by('country_name').values_list('country','country_name').distinct()
@@ -385,6 +431,7 @@ def importsDashboard(request,animal_id):
 	}
 	return render(request,'importcharts/dashboard.html',context)
 
+@login_required(login_url='user:loginUser')
 def barchart_data(request):
 	selected_countries = request.GET.getlist('countries[]')
 	selected_months = request.GET.getlist('months[]')
@@ -424,6 +471,7 @@ def barchart_data(request):
 
 	return JsonResponse(data)
 
+@login_required(login_url='user:loginUser')
 def treemapchart_data_echarts(request):
 
 	selected_year = request.GET.get('year')
@@ -474,6 +522,7 @@ def treemapchart_data_echarts(request):
 
 	return JsonResponse(context)
 
+@login_required(login_url='user:loginUser')
 def barchart_data_echarts(request):
 	context = {}
 	selected_countries = request.GET.getlist('countries[]')
@@ -511,7 +560,7 @@ def barchart_data_echarts(request):
 
 	return JsonResponse(context)
 
-
+@login_required(login_url='user:loginUser')
 def piechart_data_echart(request):
 	selected_year = request.GET.get('year')
 	selected_descriptions = request.GET.getlist('descriptions[]')
@@ -547,6 +596,7 @@ def piechart_data_echart(request):
 
 	return JsonResponse({'data':data})
 
+@login_required(login_url='user:loginUser')
 def linechart_data_echarts(request):
 	context = {}
 	selected_countries = request.GET.getlist('countries[]')
@@ -636,53 +686,3 @@ def linechart_data_echarts(request):
 	context['countries'] = selected_countries
 
 	return JsonResponse(context)
-	# legends = []
-	# main_labels = []
-	# for i,country in enumerate(selected_countries):
-	# 		country_name = Country.objects.get(pk=country).name
-	# 		legends.append(country_name)
-	# 		weights_country = weights.filter(country=country)
-	# 		data = []
-	# 		labels = []
-	# 		for month in months_in_range:
-	# 			weights_month = weights_country.filter(month=month.month)
-	# 			labels.append(f'{month.month.strftime("%Y-%m")}')
-	# 			if weights_month.exists():
-	# 				total_weight = weights_month.aggregate(total_weight=Sum('total_weight_tons'))['total_weight']
-	# 				data.append(round(total_weight, 2))
-	# 			else:
-	# 				data.append(0)
-
-	# 		dataset = {
-	# 					'label': country_name,
-	# 					'data': data,
-	# 					'borderColor': dataset_borderColors[i],
-	# 					'backgroundColor': dataset_backgroundColors[i]
-	# 			}
-	# 		main_labels = labels
-	# 		serie = {
-	# 			'name':Country.objects.get(pk=country).name,
-	# 			'type':'line',
-	# 			'stack':'Total',
-	# 			'data':data
-	# 		}
-	# 		series.append(serie)
-	# 		datasets.append(dataset)
-	# data = {
-	# 		'legends':legends,
-	# 			'labels': main_labels,
-	# 			'series': series
-	# 	}
-	# options = {
-	# 		'scales': {
-	# 				'yAxes': [{
-	# 						'ticks': {
-	# 								'beginAtZero': True
-	# 						}
-	# 				}]
-	# 		}
-	# }
-
-	# return JsonResponse({
-	# 		'data': data, 'options': options
-	# 	})

@@ -17,6 +17,10 @@ import datetime
 from django.views.generic.edit import (
     CreateView, UpdateView
 )
+from django.contrib.auth.decorators import login_required
+
+
+@login_required(login_url='user:loginUser')
 # Create your views here.
 def createQuotation(request):
 	form = QuotationForm(request.POST or None)
@@ -32,6 +36,7 @@ def createQuotation(request):
 		return render(request,"quotations/partials/forms.html",context)
 	return render(request,'quotations/create.html',context)
 
+@login_required(login_url='user:loginUser')
 def detailQuotation(request, id=None):
 	hx_url = reverse("quotation:hx-detail", kwargs={"id":id})
 	context = {
@@ -39,6 +44,7 @@ def detailQuotation(request, id=None):
 	}
 	return render(request,'quotations/details.html',context)
 
+@login_required(login_url='user:loginUser')
 def deleteQuotation(request, id=None):
 	try:
 		obj = Quotation.objects.get(id=id)
@@ -75,6 +81,7 @@ def deleteQuotation(request, id=None):
 # 	}
 # 	return render(request,'quotations/delete.html',context)
 
+@login_required(login_url='user:loginUser')
 def detailQuotation_hx(request, id=None):
 	if not request.htmx:
 		raise Http404
@@ -89,7 +96,7 @@ def detailQuotation_hx(request, id=None):
 	}
 	return render(request,'quotations/partials/details.html',context)
 
-
+@login_required(login_url='user:loginUser')
 def updateQuotation(request, id=None):
 	obj = get_object_or_404(Quotation, id=id)
 	form = QuotationForm(request.POST or None, instance=obj)
@@ -107,6 +114,7 @@ def updateQuotation(request, id=None):
 		return render(request,"quotations/partials/forms.html",context)
 	return render(request,'quotations/create.html',context)
 
+@login_required(login_url='user:loginUser')
 def listQuotation(request):
 
 	selected_freezingMethods  = request.GET.getlist('freezingMethods[]')
@@ -164,6 +172,8 @@ def listQuotation(request):
 	}
 	return render(request,'quotations/list.html',context)
 
+
+@login_required(login_url='user:loginUser')
 def detailSizePrice_update_hx_view(request, parent_id=None, id=None):
 
 	if not request.htmx:
@@ -258,6 +268,7 @@ class QuotationInline():
 						SizePriceBoxNetWeight.objects.create(sizeprice=sizeprice,net_weight=formset[i].cleaned_data["net_weight_box"])
 				#
 
+
 class QuotationCreate(QuotationInline, CreateView):
 
 	def get_context_data(self, **kwargs):
@@ -282,7 +293,7 @@ class QuotationUpdate(QuotationInline, UpdateView):
 	def get_context_data(self, **kwargs):
 			ctx = super(QuotationUpdate, self).get_context_data(**kwargs)
 			ctx['named_formsets'] = self.get_named_formsets()
-			return ctx
+			return ctx@login_required(login_url='user:loginUser')
 
 	def get_named_formsets(self):
 			sizeprices =  SizeFormSet(self.request.POST or None, self.request.FILES or None, instance=self.object, prefix='sizeprices')
@@ -301,6 +312,7 @@ class QuotationUpdate(QuotationInline, UpdateView):
 					'sizeprices': sizeprices,
 			}
 
+@login_required(login_url='user:loginUser')
 def delete_sizeprice(request, pk):
     try:
         sizeprice = SizePrice.objects.get(id=pk)
@@ -316,6 +328,8 @@ def delete_sizeprice(request, pk):
             )
     return redirect('quotation:update_quotation', pk=sizeprice.quotation.id)
 
+
+@login_required(login_url='user:loginUser')
 def add_supplier(request):
 	if request.method == 'POST':
 		form = SupplierForm(request.POST or None)
@@ -327,6 +341,7 @@ def add_supplier(request):
 		else:
 			return HttpResponse("Form is not valid")
 
+@login_required(login_url='user:loginUser')
 def add_supplier_reload_supplier_dropdown(request):
 	"""Add new supplier then update droplist"""
 	name = request.GET.get('name',None)
@@ -339,7 +354,7 @@ def add_supplier_reload_supplier_dropdown(request):
     }
 	return JsonResponse(response)
 
-
+@login_required(login_url='user:loginUser')
 @require_GET
 def quotation_chart_data(request):
 		supplier = request.GET.get('supplier', '')
@@ -401,6 +416,7 @@ def quotation_chart_data(request):
 				'prices': prices
 		})
 
+@login_required(login_url='user:loginUser')
 def price_chart_data_multiple(request):
 		selected_suppliers  = request.GET.getlist('suppliers[]')
 		selected_origins  = request.GET.getlist('origins[]')

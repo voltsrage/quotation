@@ -170,4 +170,18 @@ AUTH_USER_MODEL = 'user.User'
 # 	"DEFAULT_SCHEMA_CLASS":"drf_spectacular.openapi.AutoSchema"
 # }
 
+from django.contrib.messages import constants as messages
 
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+    messages.WARNING: 'warning'
+}
+
+
+#Email Configuration
+EMAIL_HOST=os.environ.get("EMAIL_HOST")
+EMAIL_PORT=587
+EMAIL_HOST_USER=os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD=os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL= 'Dana Project <quotations.danaproject@gmail.com>'

@@ -24,7 +24,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 		# path("quotations/admin/", quotation_site.urls),
 		path('',views.dashboard, name='dashboard'),
-		path('api/user/',include('user.urls')),
 		path('quotations/',include('quotation.urls')),
     path('importcharts/',include('importcharts.urls')),
+    path('accounts/',include('user.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
