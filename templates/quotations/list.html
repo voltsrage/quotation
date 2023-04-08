@@ -24,7 +24,7 @@
 
 							<table class="table table-bordered table-striped">
 									<thead class="thead-dark">
-											<tr>
+											<tr class='columnNames'>
 													<th>#</th>
 													<th>Species</th>
 													<th>Processing Method</th>
@@ -35,55 +35,55 @@
 													<th>Rec'd Date</th>
 													<th>Actions</th>
 											</tr>
-											<tr>
+											<tr class='columnSelects'>
 												<td></td>
-												<td>
-													<select name="specie" id="specie" class='form-control' multiple>
+												<td data-label='Species'>
+													<select name="specie" id="specie" class='form-control tableHeadSelect' multiple>
 
 														{% for specie in form.specie.field.queryset %}
 															<option value="{{ specie.id  }}">{{ specie.name }}</option>
 														{% endfor %}
 													</select>
 												</td>
-												<td>
-													<select name="processing_method" id="processing_method" class='form-control' multiple>
+												<td data-label='Processing Method'>
+													<select name="processing_method" id="processing_method" class='form-control tableHeadSelect' multiple>
 
 														{% for processing_method in form.processing_method.field.queryset %}
 															<option value="{{ processing_method.id  }}">{{ processing_method.name }}</option>
 														{% endfor %}
 													</select>
 												</td>
-												<td>
-													<select name="harvesting_method" id="harvesting_method" class='form-control' multiple>
+												<td data-label='Harvesting Method'>
+													<select name="harvesting_method" id="harvesting_method" class='form-control tableHeadSelect' multiple>
 
 														{% for harvesting_method in form.harvesting_method.field.queryset %}
 															<option value="{{ harvesting_method.id  }}">{{ harvesting_method.name }}</option>
 														{% endfor %}
 													</select>
 												</td>
-												<td>
-													<select name="freezing_method" id="freezing_method" class='form-control' multiple>
+												<td data-label='Freezing Method'>
+													<select name="freezing_method" id="freezing_method" class='form-control tableHeadSelect' multiple>
 
 														{% for freezing_method in form.freezing_method.field.queryset %}
 															<option value="{{ freezing_method.id  }}">{{ freezing_method.name }}</option>
 														{% endfor %}
 													</select>
 												</td>
-												<td>
-													<select name="origin" id="origin" class='form-control' multiple>
+												<td data-label='Origin'>
+													<select name="origin" id="origin" class='form-control tableHeadSelect' multiple>
 														{% for origin in form.origin.field.queryset %}
 															<option value="{{ origin.id  }}">{{ origin.name }}</option>
 														{% endfor %}
 													</select>
 												</td>
-												<td>
-													<select name="destination" id="destination" class='form-control' multiple>
+												<td data-label='Destination'>
+													<select name="destination" id="destination" class='form-control tableHeadSelect' multiple>
 														{% for destination in form.destination.field.queryset %}
 															<option value="{{ destination.id  }}">{{ destination.name }}</option>
 														{% endfor %}
 													</select>
 												</td>
-												<td>
+												<td data-label="Rec'd Date">
 													{{ form.start_date }}
 													{{ form.end_date }}
 												</td>
@@ -93,17 +93,17 @@
 									<tbody>
 											{% for obj in data %}
 											<tr >
-													<td>
+													<td data-label='#'>
 														{{ forloop.counter|add:data.start_index|add:"-1" }}
 													</td>
-													<td>{{ obj.specie }}</td>
-													<td>{{ obj.processing_method }}</td>
-													<td>{{ obj.harvesting_method }}</td>
-													<td>{{ obj.freezing_method }}</td>
-													<td>{{ obj.origin }}</td>
-													<td>{{ obj.destination }}</td>
-													<td>{{ obj.recieved_date }}</td>
-													<td>
+													<td data-label='Species'>{{ obj.specie }}</td>
+													<td data-label='Processing Method'>{{ obj.processing_method }}</td>
+													<td data-label='Harvesting Method'>{{ obj.harvesting_method }}</td>
+													<td data-label='Freezing Method'>{{ obj.freezing_method }}</td>
+													<td data-label='Origin'>{{ obj.origin }}</td>
+													<td data-label='Destination'>{{ obj.destination }}</td>
+													<td data-label="Rec'd Date">{{ obj.recieved_date }}</td>
+													<td data-label='Actions'>
 															<a href="{{ obj.get_formset_edit_url }}" class='btn btn-sm btn-primary'>Edit</a>
 															<a href="{{ obj.get_absolute_url }}" class='btn btn-sm btn-secondary'>Detail</a>
 															<a href="{{ obj.get_delete_url }}" class='btn btn-sm btn-danger' hx-post="{{ obj.get_delete_url }}" hx-confirm='Are you sure you wnat to delete {{obj}}?' hx-trigger='click'>Delete</a>

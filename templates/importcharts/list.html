@@ -245,7 +245,7 @@
 
 						<table class="table table-bordered table-striped">
 								<thead class="thead-dark">
-										<tr>
+										<tr class='columnNames'>
 												<th>#</th>
 												<th>Commodity Code</th>
 												<th style="width:8%">Month</th>
@@ -255,16 +255,16 @@
 												<th>Weight (kg)</th>
 												<th>Total Cost</th>
 										</tr>
-										<tr>
+										<tr class='columnSelects'>
 											<td></td>
-											<td>
+											<td data-label="Commodity Code">
 												<select name="commodityCode" id="commodityCode" class='form-control' multiple>
 													{% for commodityCode in form.commodity_code.field.queryset %}
 														<option value="{{ commodityCode  }}">{{ commodityCode }}</option>
 													{% endfor %}
 												</select>
 											</td>
-											<td>
+											<td data-label="Month">
 												<select name="start_month" id="start_month" class='form-control' >
 													<option value="">All</option>
 													{% for start_month in form.start_month.field.queryset %}
@@ -278,14 +278,14 @@
 													{% endfor %}
 												</select>
 											</td>
-											<td>
+											<td data-label="Description">
 												<select name="description" id="description" class='form-control' multiple>
 													{% for description in form.production_description.field.queryset %}
 														<option value="{{ description  }}">{{ description }}</option>
 													{% endfor %}
 												</select>
 											</td>
-											<td>
+											<td data-label="Country">
 												<select name="country" id="country" class='form-control' multiple>
 													{% for country in form.country.field.queryset %}
 														<option value="{{ country.id  }}">{{ country.name }}</option>
@@ -300,26 +300,26 @@
 								<tbody>
 									{% for obj in data %}
 											<tr >
-													<td>
+													<td data-label="#">
 														{{ forloop.counter|add:data.start_index|add:"-1" }}
 													</td>
-													<td>{{ obj.commodity_code }}</td>
-													<td>{{ obj.month|date:"Y-m" }}</td>
-													<td>{{ obj.production_description }}</td>
-													<td>{{ obj.country }}</td>
-													<td>{{ obj.price_per_kg }}</td>
-													<td>{{ obj.total_weight_kg }}</td>
-													<td>{{ obj.total_price }}</td>
+													<td data-label="Commodity Code">{{ obj.commodity_code }}</td>
+													<td data-label="Month">{{ obj.month|date:"Y-m" }}</td>
+													<td data-label="Description">{{ obj.production_description }}</td>
+													<td data-label="Country">{{ obj.country }}</td>
+													<td data-label="Price/kg (USD)">{{ obj.price_per_kg }}</td>
+													<td data-label="Weight (kg)">{{ obj.total_weight_kg }}</td>
+													<td data-label="Total Cost">{{ obj.total_price }}</td>
 											</tr>
 											{% endfor %}
 								</tbody>
 						</table>
 						<div >
-							<div class='my-4 ' style='margin: auto;width:98%;'>
+							<div class='my-4 ' style='margin: auto;width:80%;'>
 								<label for="price-slider">Select Price Range (USD$):</label>
 								<input type="text" id="price-slider" name="price-range" />
 							</div>
-							<div class='my-4' style='margin: auto;width:98%;'>
+							<div class='my-4' style='margin: auto;width:80%;'>
 								<label for="weight-slider">Select Weight Range (tons):</label>
 								<input type="text" id="weight-slider" name="weight-range" />
 							</div>

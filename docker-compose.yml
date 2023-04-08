@@ -15,47 +15,47 @@ services:
     env_file:
       - .env
     ports:
-      - 8010:8010
-    command: gunicorn --bind 0.0.0.0:8010 danaproject.wsgi
+      - 8000:8000
+    command: gunicorn --bind 0.0.0.0:8000 danaproject.wsgi
 
 
   nginx:
     build:
       context: ./nginx
     ports:
-      - "80:80"
+      - "5000:5000"
       - "443:443"
     volumes:
       - static:/vol/static
 
 
-  # db:
-  #   image: postgres
-  #   volumes:
-  #     - ./data/db:/var/lib/postgresql/data
-  #   environment:
-  #     - POSTGRES_DB=postgresDb
-  #     - POSTGRES_USER=postgresUser
-  #     - POSTGRES_PASSWORD=postgresPassword
-  #   container_name: ecommerce-postgres
-  #   ports:
-  #     - '5432:5432'
-  #   # image: mysql:5.7
-  #   # environment:
-  #   #   MYSQL_DATABASE: 'django-mysql-db'
-  #   #   MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
-  #   # volumes:
-  #   #   - ./data/mysql/db:/var/lib/mysql
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgresDb
+      - POSTGRES_USER=postgresUser
+      - POSTGRES_PASSWORD=postgresPassword
+    container_name: ecommerce-postgres
+    ports:
+      - '5432:5432'
+    # image: mysql:5.7
+    # environment:
+    #   MYSQL_DATABASE: 'django-mysql-db'
+    #   MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+    # volumes:
+    #   - ./data/mysql/db:/var/lib/mysql
 
-  # pgadmin:
-  #   container_name: pgadmin4
-  #   image: dpage/pgadmin4
-  #   restart: always
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: root@root.com
-  #     PGADMIN_DEFAULT_PASSWORD: root
-  #   ports:
-  #     - '5050:80'
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@root.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - '5050:80'
 
 volumes:
   static:
