@@ -11,22 +11,22 @@ services:
     build: .
     volumes:
       - .:/app
-      - static:/static
+      - static:/vol/web
     env_file:
       - .env
     ports:
-      - 8010:8010
-    command: gunicorn --bind 0.0.0.0:8010 danaproject.wsgi
+      - 8000:8000
+    command: gunicorn --bind 0.0.0.0:8000 danaproject.wsgi
 
 
   nginx:
-    image: nginx
+    build:
+      context: ./nginx
     ports:
-      - "80:80"
+      - "5000:5000"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - static:/static
+      - static:/vol/static
 
 
   # db:
