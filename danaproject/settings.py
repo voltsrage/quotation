@@ -37,8 +37,21 @@ SECRET_KEY = os.environ.get("SECRET_KEY", get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-CSRF_TRUSTED_ORIGINS =env.list('CSRF_TRUSTED_ORIGINS')
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+CSRF_TRUSTED_ORIGINS =[]
+CSRF_TRUSTED_ORIGINS.extend(
+    filter(
+    None,
+    os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(',')
+		)
+)
+ALLOWED_HOSTS =[]
+ALLOWED_HOSTS.extend(
+    filter(
+    None,
+    os.environ.get("ALLOWED_HOSTS", "").split(',')
+		)
+)
+
 
 
 
