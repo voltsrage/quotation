@@ -34,6 +34,8 @@ pip freeze > requirements.txt
 
  pip install -r requirements.txt
 
+ pip freeze > requirements.txt
+
  #Docker commands
 
  docker build -t django-ecommerce .
@@ -88,3 +90,5 @@ coverage html
 
 #collect static
 docker-compose run --rm app python3 manage.py collectstatic
+
+docker-compose run --rm app python manage.py dumpdata > dumped_data.json

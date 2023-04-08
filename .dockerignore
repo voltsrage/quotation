@@ -1,2 +1,14 @@
 */venv
 */.env
+.git
+.gitignore
+
+.docker
+
+
+danaproject/__pycache__/
+danaproject/*/__pycache__/
+danaproject/*/*/__pycache__/
+danaproject/*/*/*/__pycache__/
+
+data/

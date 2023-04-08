@@ -11,12 +11,18 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 import os
+import environ
 from pathlib import Path
-
+from django.core.management.utils import get_random_secret_key
 from dotenv import load_dotenv
 
 load_dotenv()
 
+env = environ.Env(
+    DEBUG = (bool, False)
+)
+
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,12 +32,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY", get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+
+CSRF_TRUSTED_ORIGINS =env.list('CSRF_TRUSTED_ORIGINS')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+
 
 
 # Application definition
@@ -44,6 +52,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'corsheaders',
 		'django_htmx',
 		'storages',
 		'rest_framework',
@@ -68,7 +77,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-		'django_htmx.middleware.HtmxMiddleware'
+		'django_htmx.middleware.HtmxMiddleware',
+  	'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = "danaproject.urls"
@@ -100,11 +110,11 @@ DATABASES = {
         # 'ENGINE': 'django.db.backends.sqlite3',
         # 'NAME': BASE_DIR / 'db.sqlite3',
 				'ENGINE': 'django.db.backends.postgresql',
-				'HOST': "db",
-				'NAME': os.environ.get("DB_NAME"),
-				'USER': os.environ.get("DB_USER"),
-				'PASSWORD': os.environ.get("DB_PASS"),
-				'PORT':5432
+				'HOST': os.environ.get("POSTGRES_HOST"),
+				'NAME': os.environ.get("POSTGRES_DB"),
+				'USER': os.environ.get("POSTGRES_USERNAME"),
+				'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+				'PORT':int(os.environ.get("POSTGRES_PORT"),)
     }
 }
 # DATABASES = {

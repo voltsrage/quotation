@@ -3,8 +3,9 @@ from django.http import HttpResponse,Http404
 from django.db.models import Avg,Max,Min,Sum,Count, Q,F,Case, Value, When,ExpressionWrapper, DecimalField
 import datetime
 from quotation.models import *
+from django.contrib.auth.decorators import login_required
 
-
+@login_required(login_url='user:loginUser')
 def dashboard(request):
 	suppliers = Supplier.objects.all()
 	origins = Country.objects.all()
