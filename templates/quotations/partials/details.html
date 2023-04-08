@@ -8,37 +8,37 @@
     <fieldset>
         <legend>Product Information</legend>
         <div class="row">
-            <div class=" col-6">
+            <div class=" col-md-6 col-12">
                 <label for="">Species</label>
                 <input class='form-control' type="text" name="" id="" value='{{obj.specie }}' readonly>
 
             </div>
-            <div class=" col-6">
+            <div class=" col-md-6 col-12">
                 <label for="">Origin</label>
                 <input class='form-control' type="text" name="" id="" value='{{obj.origin }}' readonly>
 
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-4 col-6">
+            <div class="col-lg-4 col-md-6 col-12">
                 <label for="">Processing Method</label>
                 <input class='form-control' type="text" name="" id="" value='{{obj.processing_method }}' readonly>
             </div>
-            <div class="col-lg-4  col-6">
+            <div class="col-lg-4  col-md-6 col-12">
                 <label for="">Harvesting Method</label>
                 <input class='form-control' type="text" name="" id="" value='{{obj.harvesting_method }}' readonly>
             </div>
-            <div class="col-lg-4 col-6">
+            <div class="col-lg-4 col-md-6 col-12">
                 <label for="">Freezing Method</label>
                 <input class='form-control' type="text" name="" id="" value='{{obj.freezing_method }}' readonly>
             </div>
             {{obj.product_image }}
             <div class="row">
-                <div class=" col-6">
+                <div class=" col-md-6 col-12">
                     <label for="">Catch Type</label>
                     <input class='form-control' type="text" name="" id="" value='{{obj.catch_type }}' readonly>
                 </div>
-                <div class=" col-6">
+                <div class=" col-md-6 col-12">
                     <label for="">Packing</label>
                     <input class='form-control' type="text" name="" id="" value='{{obj.packing }}' readonly>
                 </div>
@@ -49,24 +49,24 @@
     <fieldset>
         <legend>Quotation Information</legend>
         <div class="row">
-            <div class="col-lg-4 col-6">
+            <div class="col-lg-4 col-md-6 col-12">
                 <label for="">Container Quantity</label>
                 <input class='form-control' type="text" name="" id="" value='{{obj.container_quantity }}' readonly>
             </div>
-            <div class="col-lg-4  col-6">
+            <div class="col-lg-4  col-md-6 col-12">
                 <label for="">Incoterm</label>
                 <input class='form-control' type="text" name="" id="" value='{{obj.incoterm }}' readonly>
             </div>
-            <div class="col-lg-4 col-6">
+            <div class="col-lg-4 col-md-6 col-12">
                 <label for="">Tax</label>
                 <input class='form-control' type="text" name="" id="" value='{{obj.tax }}' readonly>
             </div>
             <div class="row">
-                <div class=" col-6">
+                <div class=" col-md-6 col-12">
                     <label for="">Shipped From</label>
                     <input class='form-control' type="text" name="" id="" value='{{obj.shipped_from }}' readonly>
                 </div>
-                <div class=" col-6">
+                <div class=" col-md-6 col-12">
                     <label for="">Destination</label>
                     <input class='form-control' type="text" name="" id="" value='{{obj.destination }}' readonly>
                 </div>
@@ -86,7 +86,7 @@
 </div>
 <table class="table table-striped">
     <thead class="thead-dark">
-        <tr>
+        <tr class='columnNames'>
             <th>Quotation</th>
             <th>Size</th>
             <th>Price</th>
@@ -95,9 +95,9 @@
     <tbody>
         {% for sizeprice in obj.get_sizeprize_children %}
         <tr>
-            <td> {{sizeprice.quotation}}</td>
-            <td>{{sizeprice.size}} </td>
-            <td>{{sizeprice.price}}</td>
+            <td data-label='Quotation'> {{sizeprice.quotation}}</td>
+            <td data-label='Size'>{{sizeprice.size}} </td>
+            <td data-label='Price'>{{sizeprice.price}}</td>
         </tr> {% endfor %}
     </tbody>
 </table>

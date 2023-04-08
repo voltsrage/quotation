@@ -22,6 +22,6 @@ USER appuser
 
 RUN python manage.py collectstatic --noinput
 
-EXPOSE 8010
+EXPOSE 8000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8010", "danaproject.wsgi"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "danaproject.wsgi"]
