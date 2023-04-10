@@ -553,7 +553,8 @@ def barchart_data_echarts(request):
 				context['seriesData'].append({
 										'name': country_name,
 										'type': 'bar',
-										'data': seriesData
+										'data': seriesData,
+										'top':70
 								})
 	context['yAxisData'] = yAxisData
 	context['legendData'] = legendData
