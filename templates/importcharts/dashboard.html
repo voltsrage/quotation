@@ -180,7 +180,9 @@
 
 						option = {
 							title: {
-								text: 'Stacked Line'
+								text: 'Stacked Line',
+								left: 'center',
+								top: 30
 							},
 							tooltip: {
 								trigger: 'axis',
@@ -252,13 +254,6 @@
 					var labelVals =	{
 						show: true,
 						position: 'right',
-						formatter: function(c){
-							if(c.value === 0)
-							{
-								return '';
-							}
-							return c.value
-					}
 				}
 
 				for (var i = 0; i < data.seriesData.length; i++){
@@ -347,8 +342,8 @@
 					var option = {
 						title: {
 								text: 'Total Weight (tons) Chart',
-								left: 'left',
-								top: 30
+								left: 'center',
+								top: 50
 						},
 						tooltip: {
 								trigger: 'item',
@@ -393,8 +388,8 @@
 						},
 
 						legend: {
-								orient: 'vertical',
-								left: 'right',
+								orient: 'horizontal',
+								left: 'center',
 								data: data.data.labels
 						},
 						series: [
@@ -404,6 +399,7 @@
 										radius: ['35%', '60%'],
 										center: ['50%', '60%'],
 										data: data.data.seriesData,
+										top:100,
 										itemStyle: {
 												emphasis: {
 														shadowBlur: 10,
@@ -470,7 +466,9 @@
 
 				option = {
 					title: {
-						text: 'Stacked Line'
+						text: 'Weight (tons) vs Time',
+						left: 'center',
+						top: 30
 					},
 					tooltip: {
 						trigger: 'axis',

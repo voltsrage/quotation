@@ -679,7 +679,8 @@ def linechart_data_echarts(request):
 										 'emphasis': {
 											'focus': 'series'
 										},
-										'data': seriesData
+										'data': seriesData,
+										'top':70
 								})
 	context['xAxisData'] = xAxisData
 	context['legendData'] = legendData
