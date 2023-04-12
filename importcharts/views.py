@@ -585,14 +585,18 @@ def piechart_data_echart(request):
 
 	seriesData = []
 	labels = []
+	values = []
 	for item in queryset:
 		percent = item['total_weight']
 		seriesData.append({'name':item['country__name'],'value':round(percent,2)})
+		values.append(round(percent,2))
 		labels.append(item['country__name'])
+
 
 	data = {
 				'labels': labels,
-				'seriesData': seriesData
+				'seriesData': seriesData,
+				'values':values
 		}
 
 	return JsonResponse({'data':data})

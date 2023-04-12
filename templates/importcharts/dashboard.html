@@ -138,6 +138,38 @@
 
 		var priceChart;
 
+		var colors = [
+			"#0077c8",
+			"#a30000",
+			"#005c31",
+			"#2b2b2b",
+			"#ffcc00",
+			"#ff7f0e",
+			"#6a3d9a",
+			"#d62728",
+			"#9467bd",
+			"#8c564b",
+			"#e377c2",
+			"#7f7f7f",
+			"#bcbd22",
+			"#17becf",
+			"#1f77b4",
+			"#ff5252",
+			"#673ab7",
+			"#03a9f4",
+			"#4caf50",
+			"#ffc107",
+			"#ff5722",
+			"#9c27b0",
+			"#2196f3",
+			"#00bcd4",
+			"#795548",
+			"#607d8b",
+			"#4e342e",
+			"#cddc39",
+			"#ff9800",
+			"#ffeb3b"
+		];
 
 		var lineChart = echarts.init(document.getElementById('line-chart'));
 		var barChart = echarts.init(document.getElementById('bar-chart'));
@@ -325,6 +357,16 @@
 
 		var priceChart = echarts.init(document.getElementById('price-chart'));
 
+		var getTopNNumbers = function (arr,n) {
+			// First, sort the array in descending order
+			arr.sort(function(a, b) {
+				return b - a;
+			});
+
+			// Then, return the first three elements of the array
+			return arr.slice(0, n);
+		}
+
 		$("#yearP,  #descriptionP ").on("change", function () {
 			var selectedYear = $('#yearP').val();
 			var selectedDescriptions = $('#descriptionP').val();
@@ -341,7 +383,15 @@
 				url: "{% url 'importchart:piechart_data_echart' %}",
 				data: data,
 				success: function (data) {
-					console.log(screenWidth,screenHeight)
+					var countryCount = data.data.labels.length
+					var top3Values = getTopNNumbers(data.data.values,3)
+
+					function getColor(params) {
+						console.log(params.length)
+						for (var i = 0; i < params.length;i++){
+							return colors[i]
+						}
+					}
 
 					var option = {
 						title: {
@@ -411,6 +461,7 @@
 														shadowColor: 'rgba(0, 0, 0, 0.5)'
 												}
 										},
+										color:colors,
 										encode: {
 												value: 1,
 												tooltip: [1, 2]
@@ -421,11 +472,43 @@
 
 				if(screenWidth < 768){
 					delete option.label
-					option.title.top = '35%'
+					option.series[0].label =	{
+						show: true,
+						position: 'inner',
+						formatter: function (params) {
+							if( top3Values.includes(params.value.toString()) ){
+								return (params.percent).toFixed (2) + '%';
+							}
+							return ''
+						},
+						fontSize: 9,
+						fontWeight:'bold',
+					}
+					if(countryCount <= 15){
+						option.title.top = '25%'
+						if(option.series.length >= 1){
+							option.series[0].top = '-10%'
+						}
+					}
+					else if(countryCount < 21){
+						option.title.top = '32%'
+						if(option.series.length >= 1){
+							option.series[0].top = '0%'
+						}
+					}
+					else{
+						option.title.top = '37%'
+						if(option.series.length >= 1){
+							option.series[0].top = '15%'
+						}
+					}
+
 				}
 
+				console.log(data.data.seriesData.length)
 
 
+				priceChart.setOption(option, true)
 				priceChart.setOption(option);
 				},
 				error: function (xhr, status, error) {
@@ -470,7 +553,6 @@
 
 				for (var i = 0; i < data.seriesData.length; i++){
 					data.seriesData[i].label = labelVals
-					console.log(data.seriesData[i])
 				}
 
 					var option;
