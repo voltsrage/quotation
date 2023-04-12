@@ -384,7 +384,7 @@
 				data: data,
 				success: function (data) {
 					var countryCount = data.data.labels.length
-					var top3Values = getTopNNumbers(data.data.values,3)
+					var top3Values = getTopNNumbers(data.data.values,5)
 
 					function getColor(params) {
 						console.log(params.length)
@@ -472,7 +472,7 @@
 
 				if(screenWidth < 768){
 					delete option.label
-					option.series[0].radius= ['35%', '80%'],
+					option.series[0].radius= ['35%', '85%'],
 					option.series[0].label =	{
 						show: true,
 						position: 'inner',
@@ -482,19 +482,19 @@
 							}
 							return ''
 						},
-						fontSize: 12,
+						fontSize: 15,
 						fontWeight:'bold',
 					}
 					if(countryCount <= 15){
 						option.title.top = '25%'
 						if(option.series.length >= 1){
-							option.series[0].top = '-10%'
+							option.series[0].top = '-5%'
 						}
 					}
 					else if(countryCount < 21){
 						option.title.top = '32%'
 						if(option.series.length >= 1){
-							option.series[0].top = '0%'
+							option.series[0].top = '5%'
 						}
 					}
 					else{
@@ -506,7 +506,6 @@
 
 				}
 
-				console.log(data.data.seriesData.length)
 
 
 				priceChart.setOption(option, true)
