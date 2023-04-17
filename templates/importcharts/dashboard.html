@@ -209,15 +209,18 @@
 					url: "{% url 'importchart:linechart_data_echarts' %}",
 					data: data,
 					success: function (data) {
-
+						var countryCount = data.legendData
 						var option;
 
 						option = {
-							title: {
-								text: 'Stacked Line',
+							title: [{
+								text: 'Weight vs Time',
 								left: 'center',
 								top: 30
-							},
+						},{
+							subtext: 'Weight',
+							top:37
+						}],
 							tooltip: {
 								trigger: 'axis',
 								axisPointer: {
@@ -248,14 +251,17 @@
 							},
 							yAxis: {
 								type: 'value',
-								name: 'Weight',
 								splitLine: {
 										show: false
 								}
 							},
 							series: data.seriesData
 						};
-
+						if(screenWidth < 768){
+							for (let i = 0; i < option.series.length; i++){
+								option.series[i].top = '60%'
+							}
+						}
 						option && lineChart.setOption(option);
 					},
 					error: function (xhr, status, error) {
@@ -472,7 +478,7 @@
 
 				if(screenWidth < 768){
 					delete option.label
-					option.series[0].radius= ['35%', '85%'],
+					option.series[0].radius= ['35%', '80%'],
 					option.series[0].label =	{
 						show: true,
 						position: 'inner',
@@ -537,7 +543,7 @@
 				url: "{% url 'importchart:linechart_data_echarts' %}",
 				data: data,
 				success: function (data) {
-
+					var countryCount = data.legendData
 					var labelVals =	{
 						show: true,
 						rotate: 45,
@@ -558,11 +564,14 @@
 					var option;
 
 				option = {
-					title: {
-						text: 'Weight (tons) vs Time',
+					title: [{
+						text: 'Weight vs Time',
 						left: 'center',
 						top: 30
-					},
+				},{
+					subtext: 'Weight',
+					top:35
+				}],
 					tooltip: {
 						trigger: 'axis',
 						axisPointer: {
@@ -593,13 +602,18 @@
 					},
 					yAxis: {
 						type: 'value',
-						name: 'Weight',
 						splitLine: {
 								show: false
 						}
 					},
 					series: data.seriesData
 				};
+
+				if(screenWidth < 768){
+					for (let i = 0; i < option.series.length; i++){
+						option.series[i].top = '40%'
+					}
+				}
 				lineChart.setOption(option, true)
 				option && lineChart.setOption(option);
 

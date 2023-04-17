@@ -684,7 +684,7 @@ def linechart_data_echarts(request):
 											'focus': 'series'
 										},
 										'data': seriesData,
-										'top':70
+										'top':'20%'
 								})
 	context['xAxisData'] = xAxisData
 	context['legendData'] = legendData

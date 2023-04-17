@@ -293,7 +293,7 @@ class QuotationUpdate(QuotationInline, UpdateView):
 	def get_context_data(self, **kwargs):
 			ctx = super(QuotationUpdate, self).get_context_data(**kwargs)
 			ctx['named_formsets'] = self.get_named_formsets()
-			return ctx@login_required(login_url='user:loginUser')
+			return ctx
 
 	def get_named_formsets(self):
 			sizeprices =  SizeFormSet(self.request.POST or None, self.request.FILES or None, instance=self.object, prefix='sizeprices')
