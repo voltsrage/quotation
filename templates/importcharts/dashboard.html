@@ -306,9 +306,6 @@
 							text: 'Total Weight (tons)',
 							left: 'center',
 							top: 30
-					},{
-						subtext: 'Country',
-						top:35
 					}] ,
 						tooltip: {
 								trigger: 'axis',
@@ -350,6 +347,35 @@
 						},
 						series: data.seriesData
 				};
+
+				if(screenWidth < 768){
+
+					option.xAxis.position = 'top'
+					option.xAxis.splitLine = { show: false }
+					option.xAxis.axisLine = { show: false }
+					option.xAxis.axisTick = { show: false }
+					option.xAxis.name = ''
+
+					option.yAxis.axisLine = { show: false }
+					option.yAxis.axisTick = { show: false }
+					option.yAxis.inverse = true
+					option.yAxis.axisLabel = {
+						rotate: 60 // Rotate the y-axis label text by 45 degrees
+					}
+					console.log(option.yAxis)
+
+					option.grid.top = '10%'
+					option.grid.left = '1%'
+					option.grid.right = '10%'
+					option.grid.bottom = '10%'
+
+					for (var i = 0; i < option.series.length; i++){
+						//option.series[i].barWidth = '50%'
+					}
+					console.log(option)
+				}
+
+
 				barChart.setOption(option, true)
 				barChart.setOption(option);
 				},
