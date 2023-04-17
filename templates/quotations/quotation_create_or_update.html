@@ -17,29 +17,29 @@
             <fieldset>
                 <legend>Product Information</legend>
                 <div class="row">
-                    <div class=" col-6">
+                    <div class="col-md-6 col-12">
                         {{form.specie | as_crispy_field}}
                     </div>
-                    <div class=" col-6">
+                    <div class="col-md-6 col-12">
                         {{form.origin | as_crispy_field}}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 col-6">
+                    <div class="col-lg-4 col-md-6 col-12">
                         {{form.processing_method | as_crispy_field}}
                     </div>
-                    <div class="col-lg-4  col-6">
+                    <div class="col-lg-4 col-md-6 col-12">
                         {{form.harvesting_method | as_crispy_field}}
                     </div>
-                    <div class="col-lg-4 col-6">
+                    <div class="col-lg-4 col-md-6 col-12">
                         {{form.freezing_method | as_crispy_field}}
                     </div>
                     {{form.product_image | as_crispy_field}}
                     <div class="row">
-                        <div class=" col-6">
+                        <div class="col-md-6 col-12">
                             {{form.catch_type | as_crispy_field}}
                         </div>
-                        <div class=" col-6">
+                        <div class="col-md-6 col-12">
                             {{form.packing | as_crispy_field}}
                         </div>
                     </div>
@@ -49,14 +49,14 @@
             <fieldset>
                 <legend>Quotation Information</legend>
                 <div class="row">
-                    <div class="col-lg-4 col-6">
+                    <div class="col-lg-4 col-md-6 col-12">
                         {{form.container_quantity | as_crispy_field}}
                     </div>
-                    <div class="col-lg-4  col-6">
+                    <div class="col-lg-4 col-md-6 col-12">
                         {{form.incoterm | as_crispy_field}}
                     </div>
 
-                    <div class="col-lg-4 col-6 row">
+                    <div class="col-lg-4 col-md-6 col-12 row">
                         <div class='col-10'>
                             {{form.supplier | as_crispy_field}}
                         </div>
@@ -68,13 +68,13 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 col-6">
+                    <div class="col-lg-4 col-md-6 col-12">
                         {{form.tax | as_crispy_field}}
                     </div>
-                    <div class=" col-lg-4 col-6">
+                    <div class="col-lg-4 col-md-6 col-12">
                         {{form.shipped_from | as_crispy_field}}
                     </div>
-                    <div class=" col-lg-4 col-6">
+                    <div class="col-lg-4 col-md-6 col-12">
                         {{form.destination | as_crispy_field}}
                     </div>
                 </div>
@@ -97,27 +97,27 @@
     <script type="text/html" id="sizeprices-template"> // id="inlineformsetname-template" // id='inlineformsetname-__prefix__'
         <tr id="sizeprices-__prefix__" class=h ide_all>
             {% for fields in formset.empty_form.hidden_fields %} {{ fields }} {% endfor %} {{ formss.id }}
-            <td>
+            <td data-label="Size">
                 {{formset.empty_form.size}} {% for error in formset.empty_form.size.errors %}
                 <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formset.empty_form.size.DELETE }} {% endcomment %}
             </td>
-            <td>
+            <td data-label="Price">
                 {{formset.empty_form.price}} {% for error in formset.empty_form.price.errors %}
                 <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formset.empty_form.price.DELETE }} {% endcomment %}
             </td>
-            <td>
+            <td data-label="Price Unit">
                 {{formset.empty_form.price_unit}} {% for error in formset.empty_form.price_unit.errors %}
                 <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formset.empty_form.price_unit.DELETE }} {% endcomment %}
                 <div class='netweight net-weight-display' id='netweight-__prefix__'>{{formset.empty_form.net_weight_box}}</div>
             </td>
-            <td>
+            <td data-label="Currency">
                 {{formset.empty_form.currency}} {% for error in formset.empty_form.currency.errors %}
                 <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formset.empty_form.currency.DELETE }} {% endcomment %}
             </td>
-            <td>
+            <td data-label="Delete">
                 {{formset.empty_form.DELETE}}
             </td>
-            <td>
+            <td data-label="Clone">
                 <a href="#" id="clone-sizeprice-button-__prefix__" class="btn btn-secondary clone-sizeprices">Clone</a>
             </td>
         </tr>
@@ -146,28 +146,28 @@
                     <!-- id="inlineformsetname-counter" -->
 
                     {{ formss.id }}
-                    <td>
+                    <td data-label="Size">
                         {{formss.size}} {% for error in formss.size.errors %}
                         <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formss.size.DELETE }} {% endcomment %}
                     </td>
-                    <td>
+                    <td data-label="Price">
                         {{formss.price}} {% for error in formss.price.errors %}
                         <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formss.price.DELETE }} {% endcomment %}
                     </td>
-                    <td>
+                    <td data-label="Price Unit">
                         {{formss.price_unit}} {% for error in formss.price_unit.errors %}
                         <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formss.price_unit.DELETE }} {% endcomment %}
                         <div class='netweight net-weight-display' id='netweight-{{ forloop.counter0 }}'>{{formss.net_weight_box}}</div>
                     </td>
-                    <td>
+                    <td data-label="Currency">
                         {{formss.currency}} {% for error in formss.currency.errors %}
                         <span style="color: red">{{ error }}</span> {% endfor %} {% comment %} {{ formss.currency.DELETE }} {% endcomment %}
                     </td>
 
-                    <td>
+                    <td data-label="Delete">
                         {{formss.DELETE}}
                     </td>
-                    <td>
+                    <td data-label="Clone">
                         <a href="#" id="clone-sizeprice-button-{{ forloop.counter0 }}" class="btn btn-secondary clone-sizeprices">Clone</a>
                     </td>
                     {% comment %} for delete {% endcomment %} {% if formss.instance.pk %}
