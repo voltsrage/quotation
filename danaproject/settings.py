@@ -176,13 +176,13 @@ USE_TZ = True
 STATIC_URL = "/static/"
 
 #STATIC_ROOT = BASE_DIR / 'static'
-STATIC_ROOT = '/vol/web/static'
+STATIC_ROOT = '/static'
 STATICFILES_DIRS = [
 	'danaproject/static'
 ]
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/vol/web/media'
+MEDIA_ROOT = '/media'
 #MEDIA_ROOT = BASE_DIR /'media'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
